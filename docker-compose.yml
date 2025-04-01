@@ -6,7 +6,7 @@ services:
     container_name: tripmakin-backend
     restart: always
     ports:
-      - "8080:8080"
+      - "8081:8081"
     depends_on:
       - db
     environment:
@@ -14,6 +14,8 @@ services:
       SPRING_DATASOURCE_USERNAME: tripmakin
       SPRING_DATASOURCE_PASSWORD: tripmakin
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - tripmakin-network
 
   db:
     image: postgres:latest
@@ -27,6 +29,8 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - tripmakin-network
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -39,6 +43,14 @@ services:
       - "5050:80"
     depends_on:
       - db
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - tripmakin-network
+
+networks:
+  tripmakin-network:
 
 volumes:
   pgdata:
+  pgadmin-data:
