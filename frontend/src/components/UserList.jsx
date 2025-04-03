@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-const UserList = () => {
+const UserList = ({ refresh }) => {
   const [users, setUsers] = useState([]);
 
   const fetchUsers = () => {
@@ -13,7 +13,7 @@ const UserList = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [refresh]);
 
   return (
     <div>
