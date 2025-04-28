@@ -1,13 +1,17 @@
 package com.tripmakin.controller;
 
+import com.tripmakin.exception.ResourceNotFoundException;
 import com.tripmakin.model.User;
 import com.tripmakin.repository.UserRepository;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:5173")
@@ -26,22 +30,19 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Integer id) {
         Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            return ResponseEntity.ok(user.get());
-        } else {
-            return ResponseEntity.status(404).body("User not found");
-        }
+        return user
+            .map(ResponseEntity::ok)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
-
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User newUser) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User newUser) {
         User savedUser = userRepository.save(newUser);
         return ResponseEntity.status(201).body(savedUser);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody User updatedUser) {
+    public ResponseEntity<?> updateUser(@PathVariable Integer id, @Valid @RequestBody User updatedUser) {
         Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -57,7 +58,7 @@ public class UserController {
             user.setIsActive(updatedUser.getIsActive());
             return ResponseEntity.ok(userRepository.save(user));
         } else {
-            return ResponseEntity.status(404).body("User not found");
+            return ResponseEntity.status(404).body(Map.of("error", "User not found", "status", 404));
         }
     }
 
@@ -66,9 +67,9 @@ public class UserController {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
             userRepository.deleteById(id);
-            return ResponseEntity.ok("User deleted");
+            return ResponseEntity.ok(Map.of("message", "User deleted"));
         } else {
-            return ResponseEntity.status(404).body("User not found");
+            return ResponseEntity.status(404).body(Map.of("error", "User not found", "status", 404));
         }
     }
 }
