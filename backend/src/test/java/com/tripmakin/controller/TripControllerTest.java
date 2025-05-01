@@ -2,6 +2,7 @@ package com.tripmakin.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tripmakin.model.Trip;
+import com.tripmakin.model.User;
 import com.tripmakin.repository.TripRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -60,14 +61,61 @@ class TripControllerTest {
     @Test
     void createTrip_created() throws Exception {
         Trip body = sample(null, "Paryż", LocalDate.of(2025, 6, 15), LocalDate.of(2025, 6, 20));
+        User createdBy = new User();
+        createdBy.setUserId(1);
+        body.setCreatedBy(createdBy);
+    
         Mockito.when(tripRepository.save(any(Trip.class)))
                .thenAnswer(inv -> { Trip t = inv.getArgument(0); t.setTripId(3); return t; });
-
+    
         mockMvc.perform(post("/api/trips")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(body)))
                .andExpect(status().isCreated())
                .andExpect(jsonPath("$.destination").value("Paryż"));
+    }
+
+    @Test
+    void createTrip_badRequest() throws Exception {
+        mockMvc.perform(post("/api/trips")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+               .andExpect(status().isBadRequest())
+               .andExpect(jsonPath("$.error").value("Validation failed"));
+    }
+
+    @Test
+    void createTrip_unprocessableEntity() throws Exception {
+        Trip invalidTrip = sample(null, "Paryż", LocalDate.of(2025, 6, 20), LocalDate.of(2025, 6, 15));
+    
+        mockMvc.perform(post("/api/trips")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidTrip)))
+               .andExpect(status().isBadRequest())
+               .andExpect(jsonPath("$.error").value("Validation failed"));
+    }
+
+    @Test
+    void updateTrip_badRequest() throws Exception {
+        Mockito.when(tripRepository.findById(1)).thenReturn(Optional.of(sample(1, "Paryż", LocalDate.of(2025, 6, 15), LocalDate.of(2025, 6, 20))));
+    
+        mockMvc.perform(put("/api/trips/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+               .andExpect(status().isBadRequest())
+               .andExpect(jsonPath("$.error").value("Validation failed"));
+    }
+
+    @Test
+    void updateTrip_unprocessableEntity() throws Exception {
+        Mockito.when(tripRepository.findById(1)).thenReturn(Optional.of(sample(1, "Paryż", LocalDate.of(2025, 6, 15), LocalDate.of(2025, 6, 20))));
+        Trip invalidTrip = sample(1, "Paryż", LocalDate.of(2025, 6, 20), LocalDate.of(2025, 6, 15)); 
+    
+        mockMvc.perform(put("/api/trips/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidTrip)))
+               .andExpect(status().isBadRequest()) 
+               .andExpect(jsonPath("$.error").value("Validation failed"));
     }
 
     @Test

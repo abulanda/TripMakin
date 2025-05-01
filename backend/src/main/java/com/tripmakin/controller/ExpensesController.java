@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/expenses")
 public class ExpensesController {
@@ -34,7 +36,7 @@ public class ExpensesController {
     }
 
     @PostMapping
-    public ResponseEntity<Expense> createExpense(@RequestBody Expense newExpense) {
+    public ResponseEntity<Expense> createExpense(@Valid @RequestBody Expense newExpense) {
         Expense savedExpense = expenseRepository.save(newExpense);
         return ResponseEntity.status(201).body(savedExpense);
     }

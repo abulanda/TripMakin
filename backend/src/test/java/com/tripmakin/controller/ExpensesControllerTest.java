@@ -71,6 +71,14 @@ class ExpensesControllerTest {
     }
 
     @Test
+    void createExpense_badRequest() throws Exception {
+        mockMvc.perform(post("/api/expenses")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+               .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void updateExpense_ok() throws Exception {
         Mockito.when(expenseRepository.findById(1)).thenReturn(Optional.of(sample(1, "Bilet lotniczy", BigDecimal.valueOf(1500), "Transport")));
         Expense updatedExpense = sample(1, "Hotel", BigDecimal.valueOf(2000), "Accommodation");

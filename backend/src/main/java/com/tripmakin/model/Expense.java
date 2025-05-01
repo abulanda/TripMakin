@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 @Entity
 @Table(name = "expenses")
 public class Expense {
@@ -22,19 +25,25 @@ public class Expense {
     private User user;
 
 
-    @Column(name = "date")
+    @NotNull(message = "Date is required")
+    @Column(name = "date", nullable = false)
     private LocalDate date;
 
+    @NotNull(message = "Amount is required")
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
+    @NotNull(message = "Description is required")
+    @Size(min = 1, max = 500, message = "Description must be between 1 and 500 characters")
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "category", length = 100)
+    @NotNull(message = "Category is required")
+    @Column(name = "category", length = 100, nullable = false)
     private String category;
 
-    @Column(name = "currency", length = 10)
+    @NotNull(message = "Currency is required")
+    @Column(name = "currency", length = 10, nullable = false)
     private String currency;
 
     @Column(name = "is_settled")
