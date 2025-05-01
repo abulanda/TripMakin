@@ -73,8 +73,8 @@ class UserControllerTest {
     void createUser_unprocessable() throws Exception {
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}")) // Puste body, brak wymaganych pól
-               .andExpect(status().isBadRequest()) // Zmieniono na 400
+                        .content("{}"))
+               .andExpect(status().isBadRequest())
                .andExpect(jsonPath("$.status").value(400))
                .andExpect(jsonPath("$.error").value("Validation failed"));
     }
@@ -129,7 +129,7 @@ class UserControllerTest {
     void createUser_badRequest() throws Exception {
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"lastName\":\"Flaming\"}")) // Brak wymaganych pól
+                        .content("{\"lastName\":\"Flaming\"}"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -139,7 +139,7 @@ class UserControllerTest {
 
         mockMvc.perform(put("/api/users/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"lastName\":\"Flaming\"}")) // Brak wymaganych pól
+                        .content("{\"lastName\":\"Flaming\"}"))
                 .andExpect(status().isBadRequest());
     }
 
