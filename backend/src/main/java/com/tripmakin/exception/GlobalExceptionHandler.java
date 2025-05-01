@@ -29,19 +29,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationException(MethodArgumentNotValidException ex,
-                                                                        HttpServletRequest req) {
-        String msg = ex.getBindingResult()
-                    .getFieldErrors()
-                    .stream()
-                    .map(FieldError::getDefaultMessage)
-                    .collect(Collectors.joining(", "));
-        return ResponseEntity
-                .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(Map.of(
-                        "error", msg,
-                        "status", 422,
-                        "path", req.getRequestURI()
-                ));
+                                                                         HttpServletRequest req) {
+        Map<String, Object> body = Map.of(
+            "error", "Validation failed",
+            "details", ex.getBindingResult().getFieldErrors().stream()
+                         .map(FieldError::getDefaultMessage)
+                         .toList(),
+            "status", 400,
+            "path", req.getRequestURI()
+        );
+        return ResponseEntity.badRequest().body(body);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -71,4 +68,6 @@ public class GlobalExceptionHandler {
                         "path", req.getRequestURI()
                 ));
     }
+
+    
 }
