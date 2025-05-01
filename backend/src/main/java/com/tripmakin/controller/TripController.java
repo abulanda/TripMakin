@@ -1,64 +1,68 @@
 package com.tripmakin.controller;
 
+import com.tripmakin.model.Trip;
+import com.tripmakin.repository.TripRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/trips")
 public class TripController {
 
-    private static final Map<Integer, Map<String, String>> trips = new HashMap<>();
+    private final TripRepository tripRepository;
 
-    static {
-        trips.put(1, Map.of("id", "1", "destination", "Paryż", "date", "2025-06-15"));
-        trips.put(2, Map.of("id", "2", "destination", "Nowy Jork", "date", "2025-07-20"));
+    public TripController(TripRepository tripRepository) {
+        this.tripRepository = tripRepository;
     }
 
     @GetMapping
-    public ResponseEntity<Object> getTrips() {
-        return ResponseEntity.ok(trips.values());
+    public ResponseEntity<List<Trip>> getTrips() {
+        return ResponseEntity.ok(tripRepository.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getTripById(@PathVariable int id) {
-        if (!trips.containsKey(id)) {
-            return ResponseEntity.status(404).body(Map.of("error", "Trip not found"));
+    public ResponseEntity<Object> getTripById(@PathVariable Integer id) {
+        Optional<Trip> trip = tripRepository.findById(id);
+        if (trip.isEmpty()) {
+            return ResponseEntity.status(404).body(
+                Map.of("error", "Trip not found", "status", 404)
+            );
         }
-        return ResponseEntity.ok(trips.get(id));
+        return ResponseEntity.ok(trip.get());
     }
 
     @PostMapping
-    public ResponseEntity<Object> createTrip(@RequestBody Map<String, String> newTrip) {
-        int newId = trips.size() + 1;
-        trips.put(newId, Map.of(
-            "id", String.valueOf(newId),
-            "destination", newTrip.get("destination"),
-            "date", newTrip.get("date")
-        ));
-        return ResponseEntity.status(201).body(trips.get(newId));
+    public ResponseEntity<Trip> createTrip(@RequestBody Trip newTrip) {
+        Trip savedTrip = tripRepository.save(newTrip);
+        return ResponseEntity.status(201).body(savedTrip);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateTrip(@PathVariable int id, @RequestBody Map<String, String> updatedTrip) {
-        if (!trips.containsKey(id)) {
-            return ResponseEntity.status(404).body(Map.of("error", "Trip not found"));
+    public ResponseEntity<Object> updateTrip(@PathVariable Integer id, @RequestBody Trip updatedTrip) {
+        Optional<Trip> existingTrip = tripRepository.findById(id);
+        if (existingTrip.isEmpty()) {
+            return ResponseEntity.status(404).body(
+                Map.of("error", "Trip not found", "status", 404)
+            );
         }
-        trips.put(id, Map.of(
-            "id", String.valueOf(id),
-            "destination", updatedTrip.get("destination"),
-            "date", updatedTrip.get("date")
-        ));
-        return ResponseEntity.ok(trips.get(id));
+        updatedTrip.setTripId(id);
+        Trip savedTrip = tripRepository.save(updatedTrip);
+        return ResponseEntity.ok(savedTrip);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteTrip(@PathVariable int id) {
-        if (!trips.containsKey(id)) {
-            return ResponseEntity.status(404).body(Map.of("error", "Trip not found"));
+    public ResponseEntity<Object> deleteTrip(@PathVariable Integer id) {
+        Optional<Trip> trip = tripRepository.findById(id);
+        if (trip.isEmpty()) {
+            return ResponseEntity.status(404).body(
+                Map.of("error", "Trip not found", "status", 404)
+            );
         }
-        trips.remove(id);
+        tripRepository.deleteById(id);
         return ResponseEntity.ok(Map.of("message", "Trip deleted"));
     }
 }
