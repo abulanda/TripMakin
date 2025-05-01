@@ -1,64 +1,62 @@
 package com.tripmakin.controller;
 
+import com.tripmakin.model.Expense;
+import com.tripmakin.repository.ExpenseRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/expenses")
 public class ExpensesController {
-            
-    private static final Map<Integer, Map<String, String>> expenses = new HashMap<>();
 
-    static {
-        expenses.put(1, Map.of("id", "1", "name", "Bilet lotniczy", "amount", "1500"));
-        expenses.put(2, Map.of("id", "2", "name", "Hotel", "amount", "2000"));
+    private final ExpenseRepository expenseRepository;
+
+    public ExpensesController(ExpenseRepository expenseRepository) {
+        this.expenseRepository = expenseRepository;
     }
 
     @GetMapping
-    public ResponseEntity<Object> getExpenses() {
-        return ResponseEntity.ok(expenses.values());
+    public ResponseEntity<List<Expense>> getExpenses() {
+        return ResponseEntity.ok(expenseRepository.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getExpenseById(@PathVariable int id) {
-        if (!expenses.containsKey(id)) {
+    public ResponseEntity<Object> getExpenseById(@PathVariable Integer id) {
+        Optional<Expense> expense = expenseRepository.findById(id);
+        if (expense.isEmpty()) {
             return ResponseEntity.status(404).body(Map.of("error", "Expense not found"));
         }
-        return ResponseEntity.ok(expenses.get(id));
+        return ResponseEntity.ok(expense.get());
     }
 
     @PostMapping
-    public ResponseEntity<Object> createExpense(@RequestBody Map<String, String> newExpense) {
-        int newId = expenses.size() + 1;
-        expenses.put(newId, Map.of(
-            "id", String.valueOf(newId),
-            "name", newExpense.get("name"),
-            "amount", newExpense.get("amount")
-        ));
-        return ResponseEntity.status(201).body(expenses.get(newId));
+    public ResponseEntity<Expense> createExpense(@RequestBody Expense newExpense) {
+        Expense savedExpense = expenseRepository.save(newExpense);
+        return ResponseEntity.status(201).body(savedExpense);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateExpense(@PathVariable int id, @RequestBody Map<String, String> updatedExpense) {
-        if (!expenses.containsKey(id)) {
+    public ResponseEntity<Object> updateExpense(@PathVariable Integer id, @RequestBody Expense updatedExpense) {
+        Optional<Expense> existingExpense = expenseRepository.findById(id);
+        if (existingExpense.isEmpty()) {
             return ResponseEntity.status(404).body(Map.of("error", "Expense not found"));
         }
-        expenses.put(id, Map.of(
-            "id", String.valueOf(id),
-            "name", updatedExpense.get("name"),
-            "amount", updatedExpense.get("amount")
-        ));
-        return ResponseEntity.ok(expenses.get(id));
+        updatedExpense.setExpenseId(id);
+        Expense savedExpense = expenseRepository.save(updatedExpense);
+        return ResponseEntity.ok(savedExpense);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteExpense(@PathVariable int id) {
-        if (!expenses.containsKey(id)) {
+    public ResponseEntity<Object> deleteExpense(@PathVariable Integer id) {
+        Optional<Expense> expense = expenseRepository.findById(id);
+        if (expense.isEmpty()) {
             return ResponseEntity.status(404).body(Map.of("error", "Expense not found"));
         }
-        expenses.remove(id);
+        expenseRepository.deleteById(id);
         return ResponseEntity.ok(Map.of("message", "Expense deleted"));
     }
 }
