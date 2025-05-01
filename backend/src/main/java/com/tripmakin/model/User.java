@@ -3,7 +3,9 @@ package com.tripmakin.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import jakarta.validation.constraints.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "User entity representing a user in the system")
 @Entity
 @Table(name = "users")
 public class User {

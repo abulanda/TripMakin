@@ -10,10 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Tag(name = "Users", description = "Endpoints for managing users")
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/users")
@@ -22,6 +27,7 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @Operation(summary = "Get all users")
     @GetMapping
     public ResponseEntity<List<User>> getUsers() {
         return ResponseEntity.ok(userRepository.findAll());
