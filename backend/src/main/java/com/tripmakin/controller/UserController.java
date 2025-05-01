@@ -11,8 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 
 import java.util.List;
 import java.util.Map;
@@ -27,12 +30,20 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    @Operation(summary = "Get all users")
+    @Operation(summary = "Get all users", description = "Retrieve a list of all users")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved list of users")
     @GetMapping
     public ResponseEntity<List<User>> getUsers() {
         return ResponseEntity.ok(userRepository.findAll());
     }
 
+    @Operation(summary = "Get a user by ID", description = "Retrieve a specific user by their ID")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved the user", 
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
+        @ApiResponse(responseCode = "404", description = "User not found", 
+                     content = @Content(mediaType = "application/json"))
+    })
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Integer id) {
         Optional<User> user = userRepository.findById(id);
@@ -41,12 +52,28 @@ public class UserController {
             .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
+    @Operation(summary = "Create a new user", description = "Add a new user to the system")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "User successfully created", 
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
+        @ApiResponse(responseCode = "400", description = "Validation failed", 
+                     content = @Content(mediaType = "application/json"))
+    })
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User newUser) {
         User savedUser = userRepository.save(newUser);
         return ResponseEntity.status(201).body(savedUser);
     }
 
+    @Operation(summary = "Update an existing user", description = "Update the details of an existing user")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User successfully updated", 
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
+        @ApiResponse(responseCode = "404", description = "User not found", 
+                     content = @Content(mediaType = "application/json")),
+        @ApiResponse(responseCode = "400", description = "Validation failed", 
+                     content = @Content(mediaType = "application/json"))
+    })
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Integer id, @Valid @RequestBody User updatedUser) {
         Optional<User> optionalUser = userRepository.findById(id);
@@ -68,6 +95,13 @@ public class UserController {
         }
     }
 
+    @Operation(summary = "Delete a user", description = "Remove a user from the system")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User successfully deleted", 
+                     content = @Content(mediaType = "application/json")),
+        @ApiResponse(responseCode = "404", description = "User not found", 
+                     content = @Content(mediaType = "application/json"))
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
         Optional<User> user = userRepository.findById(id);
