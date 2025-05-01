@@ -2,7 +2,8 @@ package com.tripmakin.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tripmakin.model.User;
-import com.tripmakin.repository.UserRepository;
+import com.tripmakin.service.UserService;
+import com.tripmakin.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -23,13 +23,13 @@ class UserControllerTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
-    @MockBean private UserRepository userRepository;
+    @MockBean private UserService userService;
 
     @Test
     void getUsers_ok() throws Exception {
         User u1 = sample(1, "Barbara", "Flaming", "barbara.flaming@example.com");
         User u2 = sample(2, "Tomasz", "Hamak", "tomasz.hamak@example.com");
-        Mockito.when(userRepository.findAll()).thenReturn(List.of(u1, u2));
+        Mockito.when(userService.getAllUsers()).thenReturn(List.of(u1, u2));
 
         mockMvc.perform(get("/api/users"))
                .andExpect(status().isOk())
@@ -39,7 +39,7 @@ class UserControllerTest {
 
     @Test
     void getUserById_ok() throws Exception {
-        Mockito.when(userRepository.findById(1)).thenReturn(Optional.of(sample(1)));
+        Mockito.when(userService.getUserById(1)).thenReturn(sample(1));
 
         mockMvc.perform(get("/api/users/1"))
                .andExpect(status().isOk())
@@ -48,7 +48,7 @@ class UserControllerTest {
 
     @Test
     void getUserById_notFound() throws Exception {
-        Mockito.when(userRepository.findById(1)).thenReturn(Optional.empty());
+        Mockito.when(userService.getUserById(1)).thenThrow(new ResourceNotFoundException("User not found"));
 
         mockMvc.perform(get("/api/users/1"))
                .andExpect(status().isNotFound())
@@ -59,7 +59,7 @@ class UserControllerTest {
     @Test
     void createUser_created() throws Exception {
         User body = sample(null);
-        Mockito.when(userRepository.save(any(User.class)))
+        Mockito.when(userService.createUser(any(User.class)))
                .thenAnswer(inv -> { User u = inv.getArgument(0); u.setUserId(3); return u; });
 
         mockMvc.perform(post("/api/users")
@@ -81,8 +81,9 @@ class UserControllerTest {
 
     @Test
     void updateUser_ok() throws Exception {
-        Mockito.when(userRepository.findById(1)).thenReturn(Optional.of(sample(1)));
-        Mockito.when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        Mockito.when(userService.getUserById(1)).thenReturn(sample(1));
+        Mockito.when(userService.updateUser(Mockito.eq(1), Mockito.any(User.class)))
+               .thenAnswer(inv -> inv.getArgument(1));
 
         User patch = sample(null);
         patch.setFirstName("Tomasz");
@@ -96,7 +97,7 @@ class UserControllerTest {
 
     @Test
     void updateUser_notFound() throws Exception {
-        Mockito.when(userRepository.findById(1)).thenReturn(Optional.empty());
+        Mockito.when(userService.getUserById(1)).thenThrow(new ResourceNotFoundException("User not found"));
 
         mockMvc.perform(put("/api/users/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -108,7 +109,7 @@ class UserControllerTest {
 
     @Test
     void deleteUser_ok() throws Exception {
-        Mockito.when(userRepository.findById(1)).thenReturn(Optional.of(sample(1)));
+        Mockito.when(userService.getUserById(1)).thenReturn(sample(1));
 
         mockMvc.perform(delete("/api/users/1"))
                .andExpect(status().isOk())
@@ -117,7 +118,7 @@ class UserControllerTest {
 
     @Test
     void deleteUser_notFound() throws Exception {
-        Mockito.when(userRepository.findById(1)).thenReturn(Optional.empty());
+        Mockito.when(userService.getUserById(1)).thenThrow(new ResourceNotFoundException("User not found"));
 
         mockMvc.perform(delete("/api/users/1"))
                .andExpect(status().isNotFound())
@@ -135,7 +136,7 @@ class UserControllerTest {
 
     @Test
     void updateUser_badRequest() throws Exception {
-        Mockito.when(userRepository.findById(1)).thenReturn(Optional.of(sample(1)));
+        Mockito.when(userService.getUserById(1)).thenReturn(sample(1));
 
         mockMvc.perform(put("/api/users/1")
                         .contentType(MediaType.APPLICATION_JSON)

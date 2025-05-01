@@ -1,7 +1,8 @@
 package com.tripmakin.controller;
 
+import com.tripmakin.exception.ResourceNotFoundException;
 import com.tripmakin.model.Expense;
-import com.tripmakin.repository.ExpenseRepository;
+import com.tripmakin.service.ExpenseService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +15,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import jakarta.validation.Valid;
 
@@ -23,17 +23,17 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/expenses")
 public class ExpensesController {
 
-    private final ExpenseRepository expenseRepository;
+    private final ExpenseService expenseService;
 
-    public ExpensesController(ExpenseRepository expenseRepository) {
-        this.expenseRepository = expenseRepository;
+    public ExpensesController(ExpenseService expenseService) {
+        this.expenseService = expenseService;
     }
 
     @Operation(summary = "Get all expenses", description = "Retrieve a list of all expenses")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved list of expenses")
     @GetMapping
     public ResponseEntity<List<Expense>> getExpenses() {
-        return ResponseEntity.ok(expenseRepository.findAll());
+        return ResponseEntity.ok(expenseService.getAllExpenses());
     }
 
     @Operation(summary = "Get an expense by ID", description = "Retrieve a specific expense by its ID")
@@ -44,12 +44,8 @@ public class ExpensesController {
                      content = @Content(mediaType = "application/json"))
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getExpenseById(@PathVariable Integer id) {
-        Optional<Expense> expense = expenseRepository.findById(id);
-        if (expense.isEmpty()) {
-            return ResponseEntity.status(404).body(Map.of("error", "Expense not found"));
-        }
-        return ResponseEntity.ok(expense.get());
+    public ResponseEntity<Expense> getExpenseById(@PathVariable Integer id) {
+        return ResponseEntity.ok(expenseService.getExpenseById(id));
     }
 
     @Operation(summary = "Create a new expense", description = "Add a new expense to the system")
@@ -61,8 +57,7 @@ public class ExpensesController {
     })
     @PostMapping
     public ResponseEntity<Expense> createExpense(@Valid @RequestBody Expense newExpense) {
-        Expense savedExpense = expenseRepository.save(newExpense);
-        return ResponseEntity.status(201).body(savedExpense);
+        return ResponseEntity.status(201).body(expenseService.createExpense(newExpense));
     }
 
     @Operation(summary = "Update an existing expense", description = "Update the details of an existing expense")
@@ -75,14 +70,12 @@ public class ExpensesController {
                      content = @Content(mediaType = "application/json"))
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateExpense(@PathVariable Integer id, @RequestBody Expense updatedExpense) {
-        Optional<Expense> existingExpense = expenseRepository.findById(id);
-        if (existingExpense.isEmpty()) {
-            return ResponseEntity.status(404).body(Map.of("error", "Expense not found"));
+    public ResponseEntity<Expense> updateExpense(@PathVariable Integer id, @RequestBody Expense expense) {
+        Expense updatedExpense = expenseService.updateExpense(id, expense);
+        if (updatedExpense == null) {
+            throw new ResourceNotFoundException("Expense not found");
         }
-        updatedExpense.setExpenseId(id);
-        Expense savedExpense = expenseRepository.save(updatedExpense);
-        return ResponseEntity.ok(savedExpense);
+        return ResponseEntity.ok(updatedExpense);
     }
 
     @Operation(summary = "Delete an expense", description = "Remove an expense from the system")
@@ -93,12 +86,8 @@ public class ExpensesController {
                      content = @Content(mediaType = "application/json"))
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteExpense(@PathVariable Integer id) {
-        Optional<Expense> expense = expenseRepository.findById(id);
-        if (expense.isEmpty()) {
-            return ResponseEntity.status(404).body(Map.of("error", "Expense not found"));
-        }
-        expenseRepository.deleteById(id);
+    public ResponseEntity<Map<String, String>> deleteExpense(@PathVariable Integer id) {
+        expenseService.deleteExpense(id);
         return ResponseEntity.ok(Map.of("message", "Expense deleted"));
     }
 }

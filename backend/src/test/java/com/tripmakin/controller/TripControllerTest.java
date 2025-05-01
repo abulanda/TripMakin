@@ -3,7 +3,8 @@ package com.tripmakin.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tripmakin.model.Trip;
 import com.tripmakin.model.User;
-import com.tripmakin.repository.TripRepository;
+import com.tripmakin.service.TripService;
+import com.tripmakin.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +26,13 @@ class TripControllerTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
-    @MockBean private TripRepository tripRepository;
+    @MockBean private TripService tripService;
 
     @Test
     void getTrips_ok() throws Exception {
         Trip t1 = sample(1, "Paryż", LocalDate.of(2025, 6, 15), LocalDate.of(2025, 6, 20));
         Trip t2 = sample(2, "Londyn", LocalDate.of(2025, 7, 10), LocalDate.of(2025, 7, 15));
-        Mockito.when(tripRepository.findAll()).thenReturn(List.of(t1, t2));
+        Mockito.when(tripService.getAllTrips()).thenReturn(List.of(t1, t2));
 
         mockMvc.perform(get("/api/trips"))
                .andExpect(status().isOk())
@@ -41,7 +42,7 @@ class TripControllerTest {
 
     @Test
     void getTripById_ok() throws Exception {
-        Mockito.when(tripRepository.findById(1)).thenReturn(Optional.of(sample(1, "Paryż", LocalDate.of(2025, 6, 15), LocalDate.of(2025, 6, 20))));
+        Mockito.when(tripService.getTripById(1)).thenReturn(sample(1, "Paryż", LocalDate.of(2025, 6, 15), LocalDate.of(2025, 6, 20)));
 
         mockMvc.perform(get("/api/trips/1"))
                .andExpect(status().isOk())
@@ -50,7 +51,7 @@ class TripControllerTest {
 
     @Test
     void getTripById_notFound() throws Exception {
-        Mockito.when(tripRepository.findById(1)).thenReturn(Optional.empty());
+        Mockito.when(tripService.getTripById(1)).thenThrow(new ResourceNotFoundException("Trip not found"));
 
         mockMvc.perform(get("/api/trips/1"))
                .andExpect(status().isNotFound())
@@ -64,10 +65,9 @@ class TripControllerTest {
         User createdBy = new User();
         createdBy.setUserId(1);
         body.setCreatedBy(createdBy);
-    
-        Mockito.when(tripRepository.save(any(Trip.class)))
-               .thenAnswer(inv -> { Trip t = inv.getArgument(0); t.setTripId(3); return t; });
-    
+
+        Mockito.when(tripService.createTrip(any(Trip.class))).thenReturn(body);
+
         mockMvc.perform(post("/api/trips")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(body)))
@@ -87,7 +87,7 @@ class TripControllerTest {
     @Test
     void createTrip_unprocessableEntity() throws Exception {
         Trip invalidTrip = sample(null, "Paryż", LocalDate.of(2025, 6, 20), LocalDate.of(2025, 6, 15));
-    
+
         mockMvc.perform(post("/api/trips")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidTrip)))
@@ -97,8 +97,8 @@ class TripControllerTest {
 
     @Test
     void updateTrip_badRequest() throws Exception {
-        Mockito.when(tripRepository.findById(1)).thenReturn(Optional.of(sample(1, "Paryż", LocalDate.of(2025, 6, 15), LocalDate.of(2025, 6, 20))));
-    
+        Mockito.when(tripService.getTripById(1)).thenReturn(sample(1, "Paryż", LocalDate.of(2025, 6, 15), LocalDate.of(2025, 6, 20)));
+
         mockMvc.perform(put("/api/trips/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
@@ -108,19 +108,19 @@ class TripControllerTest {
 
     @Test
     void updateTrip_unprocessableEntity() throws Exception {
-        Mockito.when(tripRepository.findById(1)).thenReturn(Optional.of(sample(1, "Paryż", LocalDate.of(2025, 6, 15), LocalDate.of(2025, 6, 20))));
-        Trip invalidTrip = sample(1, "Paryż", LocalDate.of(2025, 6, 20), LocalDate.of(2025, 6, 15)); 
-    
+        Mockito.when(tripService.getTripById(1)).thenReturn(sample(1, "Paryż", LocalDate.of(2025, 6, 15), LocalDate.of(2025, 6, 20)));
+        Trip invalidTrip = sample(1, "Paryż", LocalDate.of(2025, 6, 20), LocalDate.of(2025, 6, 15));
+
         mockMvc.perform(put("/api/trips/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidTrip)))
-               .andExpect(status().isBadRequest()) 
+               .andExpect(status().isBadRequest())
                .andExpect(jsonPath("$.error").value("Validation failed"));
     }
 
     @Test
     void deleteTrip_ok() throws Exception {
-        Mockito.when(tripRepository.findById(1)).thenReturn(Optional.of(sample(1, "Paryż", LocalDate.of(2025, 6, 15), LocalDate.of(2025, 6, 20))));
+        Mockito.doNothing().when(tripService).deleteTrip(1);
 
         mockMvc.perform(delete("/api/trips/1"))
                .andExpect(status().isOk())
@@ -129,7 +129,7 @@ class TripControllerTest {
 
     @Test
     void deleteTrip_notFound() throws Exception {
-        Mockito.when(tripRepository.findById(1)).thenReturn(Optional.empty());
+        Mockito.doThrow(new ResourceNotFoundException("Trip not found")).when(tripService).deleteTrip(1);
 
         mockMvc.perform(delete("/api/trips/1"))
                .andExpect(status().isNotFound())

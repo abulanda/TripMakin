@@ -2,7 +2,10 @@ package com.tripmakin.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tripmakin.model.Expense;
-import com.tripmakin.repository.ExpenseRepository;
+import com.tripmakin.model.Trip;
+import com.tripmakin.model.User;
+import com.tripmakin.service.ExpenseService;
+import com.tripmakin.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -25,13 +27,13 @@ class ExpensesControllerTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
-    @MockBean private ExpenseRepository expenseRepository;
+    @MockBean private ExpenseService expenseService;
 
     @Test
     void getExpenses_ok() throws Exception {
         Expense e1 = sample(1, "Bilet lotniczy", BigDecimal.valueOf(1500), "Transport");
         Expense e2 = sample(2, "Hotel", BigDecimal.valueOf(2000), "Accommodation");
-        Mockito.when(expenseRepository.findAll()).thenReturn(List.of(e1, e2));
+        Mockito.when(expenseService.getAllExpenses()).thenReturn(List.of(e1, e2));
 
         mockMvc.perform(get("/api/expenses"))
                .andExpect(status().isOk())
@@ -41,7 +43,7 @@ class ExpensesControllerTest {
 
     @Test
     void getExpenseById_ok() throws Exception {
-        Mockito.when(expenseRepository.findById(1)).thenReturn(Optional.of(sample(1, "Bilet lotniczy", BigDecimal.valueOf(1500), "Transport")));
+        Mockito.when(expenseService.getExpenseById(1)).thenReturn(sample(1, "Bilet lotniczy", BigDecimal.valueOf(1500), "Transport"));
 
         mockMvc.perform(get("/api/expenses/1"))
                .andExpect(status().isOk())
@@ -50,7 +52,7 @@ class ExpensesControllerTest {
 
     @Test
     void getExpenseById_notFound() throws Exception {
-        Mockito.when(expenseRepository.findById(1)).thenReturn(Optional.empty());
+        Mockito.when(expenseService.getExpenseById(1)).thenThrow(new ResourceNotFoundException("Expense not found"));
 
         mockMvc.perform(get("/api/expenses/1"))
                .andExpect(status().isNotFound())
@@ -60,8 +62,7 @@ class ExpensesControllerTest {
     @Test
     void createExpense_created() throws Exception {
         Expense body = sample(null, "Bilet lotniczy", BigDecimal.valueOf(1500), "Transport");
-        Mockito.when(expenseRepository.save(any(Expense.class)))
-               .thenAnswer(inv -> { Expense e = inv.getArgument(0); e.setExpenseId(3); return e; });
+        Mockito.when(expenseService.createExpense(any(Expense.class))).thenReturn(body);
 
         mockMvc.perform(post("/api/expenses")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -80,32 +81,36 @@ class ExpensesControllerTest {
 
     @Test
     void updateExpense_ok() throws Exception {
-        Mockito.when(expenseRepository.findById(1)).thenReturn(Optional.of(sample(1, "Bilet lotniczy", BigDecimal.valueOf(1500), "Transport")));
         Expense updatedExpense = sample(1, "Hotel", BigDecimal.valueOf(2000), "Accommodation");
-        Mockito.when(expenseRepository.save(any(Expense.class))).thenReturn(updatedExpense);
-
+        Mockito.when(expenseService.updateExpense(Mockito.eq(1), Mockito.any(Expense.class)))
+           .thenReturn(updatedExpense);
+           
         mockMvc.perform(put("/api/expenses/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedExpense)))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$.description").value("Hotel"));
+               .andExpect(jsonPath("$.description").value("Hotel"))
+               .andExpect(jsonPath("$.amount").value(2000))
+               .andExpect(jsonPath("$.category").value("Accommodation"));
     }
 
     @Test
     void updateExpense_notFound() throws Exception {
-        Mockito.when(expenseRepository.findById(1)).thenReturn(Optional.empty());
         Expense updatedExpense = sample(1, "Hotel", BigDecimal.valueOf(2000), "Accommodation");
+        Mockito.when(expenseService.updateExpense(Mockito.eq(1), Mockito.any(Expense.class)))
+               .thenThrow(new ResourceNotFoundException("Expense not found"));
 
         mockMvc.perform(put("/api/expenses/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedExpense)))
                .andExpect(status().isNotFound())
-               .andExpect(jsonPath("$.error").value("Expense not found"));
+               .andExpect(jsonPath("$.error").value("Expense not found"))
+               .andExpect(jsonPath("$.status").value(404));
     }
 
     @Test
     void deleteExpense_ok() throws Exception {
-        Mockito.when(expenseRepository.findById(1)).thenReturn(Optional.of(sample(1, "Bilet lotniczy", BigDecimal.valueOf(1500), "Transport")));
+        Mockito.doNothing().when(expenseService).deleteExpense(1);
 
         mockMvc.perform(delete("/api/expenses/1"))
                .andExpect(status().isOk())
@@ -114,7 +119,7 @@ class ExpensesControllerTest {
 
     @Test
     void deleteExpense_notFound() throws Exception {
-        Mockito.when(expenseRepository.findById(1)).thenReturn(Optional.empty());
+        Mockito.doThrow(new ResourceNotFoundException("Expense not found")).when(expenseService).deleteExpense(1);
 
         mockMvc.perform(delete("/api/expenses/1"))
                .andExpect(status().isNotFound())
@@ -130,6 +135,23 @@ class ExpensesControllerTest {
         e.setCurrency("PLN");
         e.setDate(LocalDate.now());
         e.setIsSettled(false);
+
+        User user = new User();
+        user.setFirstName("Test");
+        user.setLastName("User");
+        user.setEmail("test@example.com");
+        user.setPassword("secret123");
+        e.setUser(user);
+
+        Trip trip = new Trip();
+        trip.setDestination("Warszawa");
+        trip.setStartDate(LocalDate.now());
+        trip.setEndDate(LocalDate.now().plusDays(2));
+        trip.setStatus("PLANNED");
+        trip.setCreatedBy(user);
+        e.setTrip(trip);
+        
         return e;
     }
+
 }

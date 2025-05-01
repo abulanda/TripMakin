@@ -1,7 +1,7 @@
 package com.tripmakin.controller;
 
 import com.tripmakin.model.Trip;
-import com.tripmakin.repository.TripRepository;
+import com.tripmakin.service.TripService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import jakarta.validation.Valid;
 
@@ -22,17 +21,17 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/trips")
 public class TripController {
 
-    private final TripRepository tripRepository;
+    private final TripService tripService;
 
-    public TripController(TripRepository tripRepository) {
-        this.tripRepository = tripRepository;
+    public TripController(TripService tripService) {
+        this.tripService = tripService;
     }
 
     @Operation(summary = "Get all trips", description = "Retrieve a list of all trips")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved list of trips")
     @GetMapping
     public ResponseEntity<List<Trip>> getTrips() {
-        return ResponseEntity.ok(tripRepository.findAll());
+        return ResponseEntity.ok(tripService.getAllTrips());
     }
 
     @Operation(summary = "Get a trip by ID", description = "Retrieve a specific trip by its ID")
@@ -43,12 +42,8 @@ public class TripController {
                      content = @Content(mediaType = "application/json"))
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getTripById(@PathVariable Integer id) {
-        Optional<Trip> trip = tripRepository.findById(id);
-        if (trip.isEmpty()) {
-            return ResponseEntity.status(404).body(Map.of("error", "Trip not found", "status", 404));
-        }
-        return ResponseEntity.ok(trip.get());
+    public ResponseEntity<Trip> getTripById(@PathVariable Integer id) {
+        return ResponseEntity.ok(tripService.getTripById(id));
     }
 
     @Operation(summary = "Create a new trip", description = "Add a new trip to the system")
@@ -60,8 +55,7 @@ public class TripController {
     })
     @PostMapping
     public ResponseEntity<Trip> createTrip(@Valid @RequestBody Trip newTrip) {
-        Trip savedTrip = tripRepository.save(newTrip);
-        return ResponseEntity.status(201).body(savedTrip);
+        return ResponseEntity.status(201).body(tripService.createTrip(newTrip));
     }
 
     @Operation(summary = "Update an existing trip", description = "Update the details of an existing trip")
@@ -74,15 +68,8 @@ public class TripController {
                      content = @Content(mediaType = "application/json"))
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateTrip(@PathVariable Integer id, @Valid @RequestBody Trip updatedTrip) {
-        Optional<Trip> existingTrip = tripRepository.findById(id);
-        if (existingTrip.isEmpty()) {
-            return ResponseEntity.status(404).body(Map.of("error", "Trip not found", "status", 404));
-        }
-
-        updatedTrip.setTripId(id);
-        Trip savedTrip = tripRepository.save(updatedTrip);
-        return ResponseEntity.ok(savedTrip);
+    public ResponseEntity<Trip> updateTrip(@PathVariable Integer id, @Valid @RequestBody Trip updatedTrip) {
+        return ResponseEntity.ok(tripService.updateTrip(id, updatedTrip));
     }
 
     @Operation(summary = "Delete a trip", description = "Remove a trip from the system")
@@ -93,12 +80,8 @@ public class TripController {
                      content = @Content(mediaType = "application/json"))
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteTrip(@PathVariable Integer id) {
-        Optional<Trip> trip = tripRepository.findById(id);
-        if (trip.isEmpty()) {
-            return ResponseEntity.status(404).body(Map.of("error", "Trip not found", "status", 404));
-        }
-        tripRepository.deleteById(id);
+    public ResponseEntity<Map<String, String>> deleteTrip(@PathVariable Integer id) {
+        tripService.deleteTrip(id);
         return ResponseEntity.ok(Map.of("message", "Trip deleted"));
     }
 }
