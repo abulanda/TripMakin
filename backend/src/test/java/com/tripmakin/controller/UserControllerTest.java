@@ -73,9 +73,10 @@ class UserControllerTest {
     void createUser_unprocessable() throws Exception {
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}"))
-            .andExpect(status().isUnprocessableEntity())
-            .andExpect(jsonPath("$.status").value(422));
+                        .content("{}")) // Puste body, brak wymaganych pól
+               .andExpect(status().isBadRequest()) // Zmieniono na 400
+               .andExpect(jsonPath("$.status").value(400))
+               .andExpect(jsonPath("$.error").value("Validation failed"));
     }
 
     @Test
@@ -122,6 +123,24 @@ class UserControllerTest {
                .andExpect(status().isNotFound())
                .andExpect(jsonPath("$.error").value("User not found"))
                .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    void createUser_badRequest() throws Exception {
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"lastName\":\"Flaming\"}")) // Brak wymaganych pól
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void updateUser_badRequest() throws Exception {
+        Mockito.when(userRepository.findById(1)).thenReturn(Optional.of(sample(1)));
+
+        mockMvc.perform(put("/api/users/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"lastName\":\"Flaming\"}")) // Brak wymaganych pól
+                .andExpect(status().isBadRequest());
     }
 
     private User sample(Integer id) { 
