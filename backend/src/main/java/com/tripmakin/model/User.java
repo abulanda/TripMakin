@@ -2,6 +2,7 @@ package com.tripmakin.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Set;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -58,6 +59,11 @@ public class User {
 
     @Column(name = "is_active")
     private Boolean isActive = true;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    private Set<String> roles;
 
     public User() {
         this.createdAt = LocalDateTime.now();
@@ -147,5 +153,12 @@ public class User {
     }
     public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
+    }
+
+    public Set<String> getRoles() {
+        return roles;
+    }
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
     }
 }

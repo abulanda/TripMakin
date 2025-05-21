@@ -5,12 +5,14 @@ import com.tripmakin.model.Expense;
 import com.tripmakin.model.Trip;
 import com.tripmakin.model.User;
 import com.tripmakin.service.ExpenseService;
+import com.tripmakin.config.TestSecurityConfig;
 import com.tripmakin.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,6 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ExpensesController.class)
+@Import(TestSecurityConfig.class)
 class ExpensesControllerTest {
 
     @Autowired private MockMvc mockMvc;

@@ -4,24 +4,26 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tripmakin.model.Trip;
 import com.tripmakin.model.User;
 import com.tripmakin.service.TripService;
+import com.tripmakin.config.TestSecurityConfig;
 import com.tripmakin.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TripController.class)
+@Import(TestSecurityConfig.class)
 class TripControllerTest {
 
     @Autowired private MockMvc mockMvc;
