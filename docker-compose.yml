@@ -1,6 +1,14 @@
 version: '3.8'
 
 services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - tripmakin-network
   backend:
     build: ./backend
     container_name: tripmakin-backend
@@ -9,6 +17,7 @@ services:
       - "8081:8081"
     depends_on:
       - db
+      - rabbitmq
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/tripmakin
       SPRING_DATASOURCE_USERNAME: tripmakin
