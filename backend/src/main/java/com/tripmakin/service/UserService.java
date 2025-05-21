@@ -3,9 +3,10 @@ package com.tripmakin.service;
 import com.tripmakin.exception.ResourceNotFoundException;
 import com.tripmakin.model.User;
 import com.tripmakin.repository.UserRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.tripmakin.messaging.MessageProducer;
 
 import java.util.List;
 
@@ -14,6 +15,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private MessageProducer messageProducer;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -25,7 +29,9 @@ public class UserService {
     }
 
     public User createUser(User newUser) {
-        return userRepository.save(newUser);
+        User savedUser = userRepository.save(newUser);
+        messageProducer.sendMessage("Utworzono nowego użytkownika: " + savedUser.getEmail());
+        return savedUser;
     }
 
     public User updateUser(Integer id, User updatedUser) {
