@@ -4,6 +4,7 @@ import com.tripmakin.exception.ResourceNotFoundException;
 import com.tripmakin.model.User;
 import com.tripmakin.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.tripmakin.messaging.MessageProducer;
@@ -15,6 +16,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private MessageProducer messageProducer;
@@ -29,6 +33,8 @@ public class UserService {
     }
 
     public User createUser(User newUser) {
+        // Zakoduj hasło przed zapisaniem
+        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         User savedUser = userRepository.save(newUser);
         messageProducer.sendMessage("Utworzono nowego użytkownika: " + savedUser.getEmail());
         return savedUser;
