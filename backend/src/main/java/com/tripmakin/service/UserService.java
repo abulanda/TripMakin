@@ -33,7 +33,6 @@ public class UserService {
     }
 
     public User createUser(User newUser) {
-        // Zakoduj hasło przed zapisaniem
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         User savedUser = userRepository.save(newUser);
         messageProducer.sendMessage("Utworzono nowego użytkownika: " + savedUser.getEmail());

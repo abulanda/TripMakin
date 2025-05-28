@@ -9,11 +9,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -23,7 +26,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody AuthRequest authRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
@@ -33,18 +36,18 @@ public class AuthController {
                     .map(GrantedAuthority::getAuthority)
                     .toList();
 
-            return JwtUtil.generateToken(authentication.getName(), roles);
+            String token = JwtUtil.generateToken(authentication.getName(), roles);
+
+            return ResponseEntity.ok(Map.of("token", token));
         } catch (AuthenticationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
     }
-    
+
     @GetMapping("/test")
-    public String login() {
+    public String test() {
         return "Test page";
     }
-
-    
 }
 
 class AuthRequest {

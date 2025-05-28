@@ -2,7 +2,10 @@ package com.tripmakin.service;
 
 import com.tripmakin.exception.ResourceNotFoundException;
 import com.tripmakin.model.Trip;
+import com.tripmakin.model.User;
 import com.tripmakin.repository.TripRepository;
+import com.tripmakin.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,9 +14,12 @@ import java.util.List;
 public class TripService {
 
     private final TripRepository tripRepository;
+    private final UserRepository userRepository;
 
-    public TripService(TripRepository tripRepository) {
+    @Autowired
+    public TripService(TripRepository tripRepository, UserRepository userRepository) {
         this.tripRepository = tripRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Trip> getAllTrips() {
@@ -26,6 +32,13 @@ public class TripService {
     }
 
     public Trip createTrip(Trip newTrip) {
+        String email = newTrip.getCreatedBy() != null ? newTrip.getCreatedBy().getEmail() : null;
+        if (email == null) {
+            throw new IllegalArgumentException("Email użytkownika jest wymagany");
+        }
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+        newTrip.setCreatedBy(user);
         return tripRepository.save(newTrip);
     }
 
