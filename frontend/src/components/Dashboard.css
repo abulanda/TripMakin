@@ -1,0 +1,75 @@
+.dashboard {
+  padding: 2rem;
+  text-align: center;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h1 {
+  font-size: 2rem;
+  color: #3a5b3c;
+  margin-bottom: 1.5rem;
+}
+
+.no-trips, .few-trips {
+  margin-top: 2rem;
+}
+
+.create-trip-button {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.8rem 1.5rem;
+  background-color: #3a5b3c;
+  color: white;
+  text-decoration: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.create-trip-button:hover {
+  background-color: #345036;
+}
+
+.trip-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.trip-card {
+  background-color: #f1f7f2;
+  border: 1px solid #345036;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.trip-card h2 {
+  font-size: 1.5rem;
+  color: #3a5b3c;
+  margin-bottom: 0.5rem;
+}
+
+p {
+  font-size: 1rem;
+  color: #4a6b4a;
+}
+
+.trip-card p {
+  margin: 0.5rem 0;
+  color: #2e7d32;
+}
+
+.details-link {
+  display: inline-block;
+  margin-top: 1rem;
+  color: #3a5b3c;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.details-link:hover {
+  color: #345036;
+}

@@ -1,20 +1,36 @@
 import React, { useState } from "react";
+import LoginPage from "./components/LoginPage";
+import RegisterPage from "./components/RegisterPage";
+import Dashboard from "./components/Dashboard";
 import "./App.css";
-import UserList from "./components/UserList";
-import AddUserForm from "./components/AddUserForm";
 
 function App() {
-  const [refresh, setRefresh] = useState(false);
+  const [token, setToken] = useState(null);
+  const [isRegistering, setIsRegistering] = useState(false);
 
-  const handleUserAdded = () => {
-    setRefresh((prev) => !prev);
+  const handleLogin = (jwtToken) => {
+    setToken(jwtToken);
+    console.log("Zalogowano z tokenem:", jwtToken);
   };
+
+  const handleRegister = () => {
+    setIsRegistering(false);
+  };
+
+  if (!token) {
+    return isRegistering ? (
+      <RegisterPage onRegister={handleRegister} />
+    ) : (
+      <LoginPage
+        onLogin={handleLogin}
+        onSwitchToRegister={() => setIsRegistering(true)}
+      />
+    );
+  }
 
   return (
     <div className="App">
-      <h1>TripMakin</h1>
-      <AddUserForm onUserAdded={handleUserAdded} />
-      <UserList refresh={refresh}/>
+      <Dashboard />
     </div>
   );
 }
