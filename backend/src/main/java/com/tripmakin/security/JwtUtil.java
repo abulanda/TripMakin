@@ -26,4 +26,13 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
+    public static String getEmailFromAuthHeader(String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            Claims claims = validateToken(token, SECRET);
+            return claims.getSubject();
+        }
+        return null;
+    }
 }

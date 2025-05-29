@@ -1,13 +1,17 @@
 package com.tripmakin.controller;
 
 import com.tripmakin.model.Trip;
+import com.tripmakin.model.TripParticipant;
+import com.tripmakin.repository.TripParticipantRepository;
 import com.tripmakin.service.TripService;
+import com.tripmakin.security.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,8 +34,9 @@ public class TripController {
     @Operation(summary = "Get all trips", description = "Retrieve a list of all trips")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved list of trips")
     @GetMapping
-    public ResponseEntity<List<Trip>> getTrips() {
-        return ResponseEntity.ok(tripService.getAllTrips());
+    public ResponseEntity<List<Trip>> getTrips(@RequestHeader("Authorization") String authHeader) {
+        String email = JwtUtil.getEmailFromAuthHeader(authHeader);
+        return ResponseEntity.ok(tripService.getTripsForUser(email));
     }
 
     @Operation(summary = "Get a trip by ID", description = "Retrieve a specific trip by its ID")
@@ -83,5 +88,13 @@ public class TripController {
     public ResponseEntity<Map<String, String>> deleteTrip(@PathVariable Integer id) {
         tripService.deleteTrip(id);
         return ResponseEntity.ok(Map.of("message", "Trip deleted"));
+    }
+
+    @Autowired
+    private TripParticipantRepository tripParticipantRepository;
+
+    @GetMapping("/{id}/participants")
+    public List<TripParticipant> getTripParticipants(@PathVariable Integer id) {
+        return tripParticipantRepository.findByTrip_TripId(id);
     }
 }

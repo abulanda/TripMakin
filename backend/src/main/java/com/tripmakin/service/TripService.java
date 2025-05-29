@@ -2,7 +2,9 @@ package com.tripmakin.service;
 
 import com.tripmakin.exception.ResourceNotFoundException;
 import com.tripmakin.model.Trip;
+import com.tripmakin.model.TripParticipant;
 import com.tripmakin.model.User;
+import com.tripmakin.repository.TripParticipantRepository;
 import com.tripmakin.repository.TripRepository;
 import com.tripmakin.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +17,13 @@ public class TripService {
 
     private final TripRepository tripRepository;
     private final UserRepository userRepository;
+    private final TripParticipantRepository tripParticipantRepository;
 
     @Autowired
-    public TripService(TripRepository tripRepository, UserRepository userRepository) {
+    public TripService(TripRepository tripRepository, UserRepository userRepository, TripParticipantRepository tripParticipantRepository) {
         this.tripRepository = tripRepository;
         this.userRepository = userRepository;
+        this.tripParticipantRepository = tripParticipantRepository;
     }
 
     public List<Trip> getAllTrips() {
@@ -39,7 +43,16 @@ public class TripService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
         newTrip.setCreatedBy(user);
-        return tripRepository.save(newTrip);
+        Trip savedTrip = tripRepository.save(newTrip);
+
+        TripParticipant participant = new TripParticipant();
+        participant.setTrip(savedTrip);
+        participant.setUser(user);
+        participant.setRole("OWNER");
+        participant.setStatus("ACTIVE");
+        tripParticipantRepository.save(participant);
+
+        return savedTrip;
     }
 
     public Trip updateTrip(Integer id, Trip updatedTrip) {
@@ -54,5 +67,9 @@ public class TripService {
         Trip trip = tripRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip not found"));
         tripRepository.delete(trip);
+    }
+
+    public List<Trip> getTripsForUser(String email) {
+        return tripRepository.findAllByUserEmail(email);
     }
 }

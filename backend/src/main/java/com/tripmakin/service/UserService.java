@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.tripmakin.messaging.MessageProducer;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -34,6 +35,9 @@ public class UserService {
 
     public User createUser(User newUser) {
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        if (newUser.getRoles() == null || newUser.getRoles().isEmpty()) {
+            newUser.setRoles(Set.of("USER"));
+        }
         User savedUser = userRepository.save(newUser);
         messageProducer.sendMessage("Utworzono nowego użytkownika: " + savedUser.getEmail());
         return savedUser;
