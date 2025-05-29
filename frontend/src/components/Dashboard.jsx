@@ -66,13 +66,18 @@ const Dashboard = () => {
             <div className="trip-list">
               {trips.map((trip) => (
                 <div key={trip.tripId} className="trip-card">
-                  <h2>{trip.destination}</h2>
+                  <h2>
+                    <Link to={`/trips/${trip.tripId}`}>{trip.destination}</Link>
+                  </h2>
                   <p>
                     <strong>Data:</strong> {trip.startDate} - {trip.endDate}
                   </p>
                   <p>
                     <strong>Status:</strong> {trip.status}
                   </p>
+                  <Link className="details-link" to={`/trips/${trip.tripId}`}>
+                    Szczegóły
+                  </Link>
                 </div>
               ))}
               <button
