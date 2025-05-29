@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import AddExpenseForm from "./AddExpenseForm";
 import ScheduleList from "./ScheduleList";
+import InviteUserForm from "./InviteUserForm";
 
 const TripDetails = () => {
   const { id } = useParams();
@@ -9,6 +10,7 @@ const TripDetails = () => {
   const [participants, setParticipants] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [showAddExpense, setShowAddExpense] = useState(false);
+  const [showInviteUser, setShowInviteUser] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,6 +49,10 @@ const TripDetails = () => {
     summary[name] = (summary[name] || 0) + parseFloat(e.amount);
   });
 
+  const myParticipant = participants.find(
+    (p) => p.user?.userId === Number(localStorage.getItem("userId"))
+  );
+
   if (loading || !trip) return <p>Ładowanie...</p>;
 
   return (
@@ -65,6 +71,25 @@ const TripDetails = () => {
           </li>
         ))}
       </ul>
+      {}
+      {myParticipant && myParticipant.role === "OWNER" && (
+        <>
+          <button onClick={() => setShowInviteUser(!showInviteUser)}>
+            {showInviteUser ? "Anuluj zaproszenie" : "Zaproś użytkownika"}
+          </button>
+          {showInviteUser && (
+            <InviteUserForm tripId={id} onUserInvited={() => {
+              setShowInviteUser(false);
+              const token = localStorage.getItem("jwtToken");
+              fetch(`/api/trips/${id}/participants`, {
+                headers: { Authorization: `Bearer ${token}` },
+              })
+                .then((res) => res.ok ? res.json() : [])
+                .then((data) => setParticipants(data));
+            }} />
+          )}
+        </>
+      )}
       <h3>Wydatki:</h3>
       {expenses.length === 0 ? (
         <p>Brak wydatków</p>
@@ -116,6 +141,28 @@ const TripDetails = () => {
       )}
       <ScheduleList tripId={id} />
       <Link to="/">⬅ Powrót</Link>
+      {}
+      {myParticipant && myParticipant.role !== "OWNER" && (
+        <button
+          onClick={() => {
+            const token = localStorage.getItem("jwtToken");
+            fetch(
+              `http://localhost:8081/api/trips/${id}/participants/${myParticipant.user.userId}`,
+              {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            )
+              .then((res) => {
+                if (!res.ok) throw new Error("Błąd podczas opuszczania wycieczki");
+                window.location.href = "/";
+              })
+              .catch((err) => alert(err.message));
+          }}
+        >
+          Opuść wycieczkę
+        </button>
+      )}
     </div>
   );
 };
