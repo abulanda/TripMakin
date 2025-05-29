@@ -87,4 +87,18 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.ok(Map.of("message", "User deleted"));
     }
+
+    @Operation(summary = "Get user by email", description = "Retrieve a user by their email address")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved the user"),
+        @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @GetMapping("/email/{email}")
+    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
+        User user = userService.findByEmail(email);
+        if (user == null) {
+            throw new ResourceNotFoundException("User not found");
+        }
+        return ResponseEntity.ok(user);
+    }
 }

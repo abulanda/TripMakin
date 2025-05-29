@@ -1,5 +1,6 @@
 package com.tripmakin.controller;
 
+import com.tripmakin.exception.ResourceNotFoundException;
 import com.tripmakin.model.Trip;
 import com.tripmakin.model.TripParticipant;
 import com.tripmakin.repository.TripParticipantRepository;
@@ -96,5 +97,16 @@ public class TripController {
     @GetMapping("/{id}/participants")
     public List<TripParticipant> getTripParticipants(@PathVariable Integer id) {
         return tripParticipantRepository.findByTrip_TripId(id);
+    }
+
+    @DeleteMapping("/{tripId}/participants/{userId}")
+    public ResponseEntity<?> leaveTrip(@PathVariable Integer tripId, @PathVariable Integer userId) {
+        TripParticipant participant = tripParticipantRepository.findByTrip_TripIdAndUser_UserId(tripId, userId)
+            .orElseThrow(() -> new ResourceNotFoundException("Participant not found"));
+        if ("OWNER".equals(participant.getRole())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Owner cannot leave the trip"));
+        }
+        tripParticipantRepository.delete(participant);
+        return ResponseEntity.ok(Map.of("message", "Left the trip"));
     }
 }
