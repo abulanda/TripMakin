@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import AddExpenseForm from "./AddExpenseForm";
+import ScheduleList from "./ScheduleList";
 
 const TripDetails = () => {
   const { id } = useParams();
@@ -113,6 +114,7 @@ const TripDetails = () => {
             .then((data) => setExpenses(data));
         }} participants={participants} />
       )}
+      <ScheduleList tripId={id} />
       <Link to="/">⬅ Powrót</Link>
     </div>
   );

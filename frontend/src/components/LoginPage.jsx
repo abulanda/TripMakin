@@ -24,6 +24,7 @@ const LoginPage = ({ onLogin, onSwitchToRegister }) => {
       })
       .then((data) => {
         localStorage.setItem("jwtToken", data.token); 
+        localStorage.setItem("userId", data.userId);
         onLogin(data.token);
       })
       .catch((err) => alert(err.message));
