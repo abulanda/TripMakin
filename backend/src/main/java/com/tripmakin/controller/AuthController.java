@@ -1,5 +1,7 @@
 package com.tripmakin.controller;
 
+import com.tripmakin.model.User;
+import com.tripmakin.service.UserService;
 import com.tripmakin.security.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,13 +22,15 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
+    private final UserService userService;
 
-    public AuthController(AuthenticationManager authenticationManager) {
+    public AuthController(AuthenticationManager authenticationManager, UserService userService) {
         this.authenticationManager = authenticationManager;
+        this.userService = userService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody AuthRequest authRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
@@ -38,7 +42,15 @@ public class AuthController {
 
             String token = JwtUtil.generateToken(authentication.getName(), roles);
 
-            return ResponseEntity.ok(Map.of("token", token));
+            User user = userService.findByEmail(authentication.getName());
+            if (user == null) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
+            }
+
+            return ResponseEntity.ok(Map.of(
+                "token", token,
+                "userId", user.getUserId()
+            ));
         } catch (AuthenticationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
