@@ -47,4 +47,8 @@ public class ExpenseService {
                 .orElseThrow(() -> new ResourceNotFoundException("Expense not found"));
         expenseRepository.delete(expense);
     }
+
+    public List<Expense> getExpensesForTrip(Integer tripId) {
+        return expenseRepository.findByTrip_TripId(tripId);
+    }
 }

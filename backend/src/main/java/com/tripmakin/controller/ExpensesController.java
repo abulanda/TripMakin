@@ -90,4 +90,11 @@ public class ExpensesController {
         expenseService.deleteExpense(id);
         return ResponseEntity.ok(Map.of("message", "Expense deleted"));
     }
+
+    @Operation(summary = "Get expenses for a trip", description = "Retrieve a list of expenses for a specific trip")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved list of expenses for the trip")
+    @GetMapping("/trip/{tripId}")
+    public ResponseEntity<List<Expense>> getExpensesForTrip(@PathVariable Integer tripId) {
+        return ResponseEntity.ok(expenseService.getExpensesForTrip(tripId));
+    }
 }
