@@ -32,10 +32,6 @@ const LoginPage = ({ onLogin, onSwitchToRegister }) => {
 
   return (
     <div className="login-page">
-        <div className="divide">
-            <div className="left-side">
-                <img src="/palm.png" alt="palm" className="palm" />
-            </div>
             <div className="center">
                 <img src="/logo.svg" alt="Logo" className="logo" />
                 <div className="login-container">
@@ -68,10 +64,6 @@ const LoginPage = ({ onLogin, onSwitchToRegister }) => {
                     </form>
                 </div>
             </div>
-            <div className="right-side">
-                <img src="/palm2.png" alt="palm" className="palm" />
-            </div>
-        </div>
     </div>
   );
 };

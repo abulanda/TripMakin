@@ -1,4 +1,37 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #f1f7f2 !important;
+}
+
+#root, .App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .App {
   text-align: center;
-  padding: 2rem;
+  padding-top: 60px;
+}
+
+h2 {
+  color: #4a6b4a;
+}
+
+h3 {
+  color: #4a6b4a;
+}
+
+li {
+  color: #4a6b4a;
+}
+
+h4 {
+  color: #4a6b4a;
+}
+
+table {
+  color: #4a6b4a;
 }

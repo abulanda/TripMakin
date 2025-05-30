@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./LoginPage.css";
+import "./RegisterPage.css";
 
 const RegisterPage = ({ onRegister }) => {
   const [formData, setFormData] = useState({
@@ -47,55 +47,61 @@ const RegisterPage = ({ onRegister }) => {
   };
 
   return (
-    <div className="login-page">
-      <img src="/logo.svg" alt="Logo" className="logo" />
-      <div className="login-container">
+    <div className="register-page">
+      <img src="/logo.svg" alt="Logo" className="register-logo" />
+      <div className="register-container">
         <h1>Stwórz swoje konto!</h1>
         <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            placeholder="Imię"
-            required
-          />
-          <input
-            type="text"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            placeholder="Nazwisko"
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Email"
-            required
-          />
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Hasło"
-            required
-          />
-          <input
-            type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            placeholder="Potwierdź hasło"
-            required
-          />
-          <div className="button-group">
-            <button type="submit" className="primary-button">
-              Zarejestruj się
-            </button>
+          <div className="register-columns">
+            <div className="register-left">
+              <input
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                placeholder="Imię"
+                required
+              />
+              <input
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                placeholder="Nazwisko"
+                required
+              />
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Email"
+                required
+              />
+            </div>
+            <div className="register-right">
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Hasło"
+                required
+              />
+              <input
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Potwierdź hasło"
+                required
+              />
+              <div className="button-group">
+                <button type="submit" className="primary-button">
+                  Zarejestruj się
+                </button>
+              </div>
+            </div>
           </div>
         </form>
       </div>
