@@ -10,7 +10,9 @@ import com.tripmakin.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TripService {
@@ -70,6 +72,35 @@ public class TripService {
     }
 
     public List<Trip> getTripsForUser(String email) {
-        return tripRepository.findAllByUserEmail(email);
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+        List<Trip> trips = tripRepository.findAllByUserId(user.getUserId());
+        LocalDate today = LocalDate.now();
+        for (Trip trip : trips) {
+            boolean changed = false;
+            if (trip.getStartDate() != null && trip.getEndDate() != null) {
+                if (today.isBefore(trip.getStartDate())) {
+                    if (!"PLANNED".equals(trip.getStatus())) {
+                        trip.setStatus("PLANNED");
+                        changed = true;
+                    }
+                } else if ((today.isEqual(trip.getStartDate()) || today.isAfter(trip.getStartDate()))
+                        && today.isBefore(trip.getEndDate().plusDays(1))) {
+                    if (!"IN_PROGRESS".equals(trip.getStatus())) {
+                        trip.setStatus("IN_PROGRESS");
+                        changed = true;
+                    }
+                } else if (today.isAfter(trip.getEndDate())) {
+                    if (!"FINISHED".equals(trip.getStatus())) {
+                        trip.setStatus("FINISHED");
+                        changed = true;
+                    }
+                }
+            }
+            if (changed) {
+                tripRepository.save(trip);
+            }
+        }
+        return trips;
     }
 }

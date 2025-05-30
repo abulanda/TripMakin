@@ -49,11 +49,17 @@ const TripDetails = () => {
     (p) => p.user?.userId === Number(localStorage.getItem("userId"))
   );
 
+  const handleLogout = () => {
+    localStorage.removeItem("jwtToken");
+    localStorage.removeItem("userId");
+    window.location.href = "/";
+  };
+
   if (loading || !trip) return <p>Ładowanie...</p>;
 
   return (
     <>
-      <Navbar />
+      <Navbar onLogout={handleLogout} />
       <div className="trip-details-page">
         <div className="trip-details-back">
           <Link to="/">⬅ Powrót</Link>
