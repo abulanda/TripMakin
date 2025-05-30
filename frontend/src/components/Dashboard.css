@@ -38,11 +38,11 @@ h1 {
 }
 
 .trip-card {
-  background-color: #f1f7f2;
-  border: 1px solid #345036;
+  background-color: #f7faf8;
+  border: none;
   border-radius: 10px;
   padding: 1.5rem;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 5px 5px 5px rgba(58, 91, 60, 0.10);
   text-align: left;
 }
 
@@ -50,6 +50,16 @@ h1 {
   font-size: 1.5rem;
   color: #3a5b3c;
   margin-bottom: 0.5rem;
+}
+
+.trip-card h3 a {
+  color: #3a5b3c;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.trip-card h3 a:hover {
+  text-decoration: underline;
 }
 
 p {
@@ -72,4 +82,186 @@ p {
 
 .details-link:hover {
   color: #345036;
+}
+
+.dashboard-panels {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  margin: 2rem auto 0 auto;
+  gap: 2rem;
+  min-height: 60vh;
+}
+
+.dashboard-left {
+  flex: 1 1 25%;
+  background: #f7faf8;
+  border-radius: 10px;
+  padding: 1.5rem 1rem;
+  box-shadow: 10px 10px 10px rgba(0,0,0,0.04);
+  min-width: 220px;
+  max-width: 300px;
+}
+
+.dashboard-right {
+  flex: 3 1 75%;
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.5rem 1rem;
+  box-shadow: 10px 10px 10px rgba(0,0,0,0.04);
+  min-width: 0;
+  max-height: 70vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #7fa88c #f7faf8;
+}
+
+.dashboard-right::-webkit-scrollbar {
+  width: 10px;
+  background: #f7faf8;
+  border-radius: 8px;
+}
+
+.dashboard-right::-webkit-scrollbar-thumb {
+  background: #7fa88c;
+  border-radius: 8px;
+}
+
+.dashboard-right::-webkit-scrollbar-thumb:hover {
+  background: #3a5b3c;
+}
+
+.dashboard-right h2 {
+  text-align: left;
+  margin-top: 0.1rem;
+}
+
+.trip-list-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.create-trip-button-wide {
+  display: block;
+  width: 100%;
+  max-width: 1200px;
+  margin: 2rem auto 0 auto;
+  padding: 1rem 0;
+  background-color: #3a5b3c;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.create-trip-button-wide:hover {
+  background-color: #345036;
+}
+
+.invitation-panel {
+  text-align: justify;
+}
+
+.invitation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.invitation-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0.5rem 0;
+}
+
+.invitation-text {
+  margin-bottom: 0.5rem;
+  text-align: justify;
+  color: #4a6b4a;
+}
+
+.invitation-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-start;
+}
+
+.invitation-buttons button {
+  min-width: 90px;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  border: none;
+  background: #7fa88c;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.invitation-buttons button:hover {
+  background: #3a5b3c;
+}
+
+.invitation-divider {
+  border: none;
+  border-top: 1px solid #b5cbb2;
+  margin: 0.5rem 0;
+}
+
+.dashboard-bottom {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0.5rem auto 2rem auto;
+  display: flex;
+  justify-content: center;
+}
+
+.dashboard-bottom form {
+  width: 100%;
+  max-width: 1200px;
+  background: #f7faf8;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(58, 91, 60, 0.18);
+  padding: 2rem;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #7fa88c #f7faf8;
+}
+
+body::-webkit-scrollbar, html::-webkit-scrollbar {
+  width: 10px;
+  background: #f7faf8;
+  border-radius: 8px;
+}
+
+body::-webkit-scrollbar-thumb, html::-webkit-scrollbar-thumb {
+  background: #7fa88c;
+  border-radius: 8px;
+}
+
+body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
+  background: #3a5b3c;
+}
+
+@media (max-width: 900px) {
+  .dashboard-panels {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .dashboard-left,
+  .dashboard-right {
+    max-width: 100%;
+    min-width: 0;
+  }
+  .create-trip-button-wide {
+    max-width: 100%;
+  }
 }
