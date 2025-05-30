@@ -339,6 +339,15 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
   margin-bottom: 1.5rem;
 }
 
+.user-panel,
+.user-panel h2,
+.user-panel p,
+.user-panel label,
+.user-panel input,
+.user-panel textarea {
+  text-align: left;
+}
+
 .user-panel form input,
 .user-panel form textarea {
   width: 100%;

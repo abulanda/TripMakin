@@ -14,13 +14,16 @@
 }
 
 .trip-info-card,
-.trip-participants-card {
+.trip-participants-card,
+.trip-expenses-card,
+.trip-schedule-card {
   flex: 1 1 50%;
   background: #f7faf8;
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(58, 91, 60, 0.10);
   padding: 2rem;
   min-width: 300px;
+  text-align: left;
 }
 
 .trip-details-bottom {
