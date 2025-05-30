@@ -89,7 +89,7 @@ p {
   width: 100%;
   max-width: 1200px;
   margin: 2rem auto 0 auto;
-  gap: 2rem;
+  gap: 1rem;
   min-height: 60vh;
 }
 
@@ -101,6 +101,39 @@ p {
   box-shadow: 10px 10px 10px rgba(0,0,0,0.04);
   min-width: 220px;
   max-width: 300px;
+}
+
+.dashboard-center {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.5rem 1rem;
+  box-shadow: 10px 10px 10px rgba(0,0,0,0.04);
+  min-width: 0;
+  margin: 0 1rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #7fa88c #f7faf8;
+}
+
+.dashboard-center h2 {
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-center::-webkit-scrollbar {
+  width: 10px;
+  background: #f7faf8;
+  border-radius: 8px;
+}
+
+.dashboard-center::-webkit-scrollbar-thumb {
+  background: #7fa88c;
+  border-radius: 8px;
+}
+
+.dashboard-center::-webkit-scrollbar-thumb:hover {
+  background: #3a5b3c;
 }
 
 .dashboard-right {
@@ -264,4 +297,82 @@ body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
   .create-trip-button-wide {
     max-width: 100%;
   }
+}
+
+.dashboard-news {
+  background: #f7faf8;
+  border-radius: 10px;
+  padding: 1.5rem 1rem;
+  box-shadow: 10px 10px 10px rgba(0,0,0,0.04);
+  min-width: 220px;
+  max-width: 300px;
+  text-align: justify;
+}
+
+.news-panel {
+  font-size: 1rem;
+  color: #3a5b3c;
+  text-align: justify;
+}
+
+.news-panel h3 {
+  text-align: justify;
+  margin-bottom: 1em;
+}
+
+.user-panel {
+  margin-top: 80px;
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  background: #f7faf8;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(58,91,60,0.10), 0 1.5px 6px rgba(58,91,60,0.08);
+  padding: 2.5rem 2rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.user-panel h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.user-panel form input,
+.user-panel form textarea {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid #b5cbb2;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #fff;
+}
+
+.user-panel form button[type="submit"] {
+  background: #3a5b3c;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-right: 0.5rem;
+}
+
+.user-panel form button[type="button"] {
+  background: #b5cbb2;
+  color: #3a5b3c;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.user-panel img {
+  display: block;
+  margin: 1rem auto;
+  box-shadow: 0 2px 8px rgba(58,91,60,0.08);
 }

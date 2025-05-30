@@ -4,6 +4,7 @@ import "./Dashboard.css";
 import AddTripForm from "./AddTripForm";
 import InvitationNotifications from "./InvitationNotifications";
 import Navbar from "./Navbar";
+import NewsPanel from "./NewsPanel";
 
 const Dashboard = () => {
   const [trips, setTrips] = useState([]);
@@ -57,10 +58,10 @@ const Dashboard = () => {
     <>
       <Navbar onLogout={handleLogout} />
       <div className="dashboard-panels">
-        <div className="dashboard-left">
+        <div className="dashboard-left" style={{ flex: "1 1 25%" }}>
           <InvitationNotifications onInvitationResponded={fetchTrips} />
         </div>
-        <div className="dashboard-right">
+        <div className="dashboard-center" style={{ flex: "1 1 50%" }}>
           <h2>Twoje wycieczki</h2>
           {trips.length === 0 ? (
             <div className="no-trips">
@@ -86,6 +87,9 @@ const Dashboard = () => {
               ))}
             </div>
           )}
+        </div>
+        <div className="dashboard-news" style={{ flex: "1 1 25%" }}>
+          <NewsPanel trips={trips} />
         </div>
       </div>
       <div className="dashboard-bottom">

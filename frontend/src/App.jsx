@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
 import LoginPage from "./components/LoginPage";
 import RegisterPage from "./components/RegisterPage";
 import Dashboard from "./components/Dashboard";
+import UserPanel from "./components/UserPanel";
 import "./App.css";
 
 function App() {
@@ -39,7 +41,10 @@ function App() {
 
   return (
     <div className="App">
-      <Dashboard />
+      <Routes>
+        <Route path="*" element={<Dashboard />} />
+        <Route path="/users/:id" element={<UserPanel />} />
+      </Routes>
     </div>
   );
 }
