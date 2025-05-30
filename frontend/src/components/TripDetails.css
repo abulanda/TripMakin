@@ -1,0 +1,171 @@
+.trip-details-page {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 70px 1rem 3rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.trip-details-top {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.trip-info-card,
+.trip-participants-card {
+  flex: 1 1 50%;
+  background: #f7faf8;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(58, 91, 60, 0.10);
+  padding: 2rem;
+  min-width: 300px;
+}
+
+.trip-details-bottom {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.trip-expenses-card,
+.trip-schedule-card {
+  flex: 1 1 50%;
+  background: #f7faf8;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(58, 91, 60, 0.10);
+  padding: 2rem;
+  min-width: 300px;
+}
+
+.trip-expenses-card table,
+.trip-schedule-card table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(58, 91, 60, 0.06);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.trip-expenses-card th,
+.trip-schedule-card th {
+  background: #e5eee8;
+  color: #3a5b3c;
+  font-weight: 600;
+  padding: 0.7rem 0.5rem;
+  text-align: left;
+  border-bottom: 2px solid #c7d8cc;
+  font-size: 1rem;
+}
+
+.trip-expenses-card td,
+.trip-schedule-card td {
+  padding: 0.7rem 0.5rem;
+  color: #345036;
+  font-size: 0.98rem;
+  border-bottom: 1px solid #f1f7f2;
+  vertical-align: top;
+}
+
+.trip-expenses-card tr:last-child td,
+.trip-schedule-card tr:last-child td {
+  border-bottom: none;
+}
+
+.trip-expenses-card th,
+.trip-expenses-card td,
+.trip-schedule-card th,
+.trip-schedule-card td {
+  min-width: 80px;
+  max-width: 220px;
+  word-break: break-word;
+}
+
+.trip-expenses-card th:first-child,
+.trip-expenses-card td:first-child,
+.trip-schedule-card th:first-child,
+.trip-schedule-card td:first-child {
+  padding-left: 1.2rem;
+}
+
+.trip-details-back {
+  text-align: left;
+}
+
+.trip-details-back a {
+  background: none;
+  color: #3a5b3c;
+  padding: 0;
+  border-radius: 0;
+  text-decoration: underline;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: color 0.2s;
+  box-shadow: none;
+}
+
+.trip-details-back a:hover {
+  color: #345036;
+  background: none;
+}
+
+.trip-info-card button,
+.trip-participants-card button,
+.trip-expenses-card button,
+.trip-schedule-card button {
+  display: block;
+  margin-left: auto;
+  margin-top: 1rem;
+  background-color: #3a5b3c;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.trip-info-card button:hover,
+.trip-participants-card button:hover,
+.trip-expenses-card button:hover,
+.trip-schedule-card button:hover {
+  background-color: #345036;
+}
+
+.participants-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.participant-item {
+  padding: 0.3rem 0;
+  color: #345036;
+  text-align: left;
+}
+
+.participant-divider {
+  border: none;
+  border-top: 1px solid #c7d8cc;
+  margin: 0.1rem 0;
+}
+
+@media (max-width: 900px) {
+  .trip-expenses-card table,
+  .trip-schedule-card table {
+    font-size: 0.95rem;
+  }
+  .trip-expenses-card th,
+  .trip-expenses-card td,
+  .trip-schedule-card th,
+  .trip-schedule-card td {
+    padding: 0.5rem 0.3rem;
+    max-width: 120px;
+  }
+}

@@ -33,22 +33,29 @@ const InvitationNotifications = ({ onInvitationResponded }) => {
   if (!userId) return null;
 
   return (
-    <div>
+    <div className="invitation-panel">
       <h3>Zaproszenia</h3>
       {invitations.filter(i => i.status === "PENDING").length === 0 ? (
         <p>Brak nowych zaproszeń</p>
       ) : (
-        <ul>
+        <div className="invitation-list">
           {invitations
             .filter(i => i.status === "PENDING")
-            .map((i) => (
-              <li key={i.invitationId}>
-                Zaproszenie do wycieczki: <b>{i.trip?.destination}</b> od <b>{i.inviter?.firstName} {i.inviter?.lastName}</b>
-                <button onClick={() => respond(i.invitationId, "ACCEPTED")}>Akceptuj</button>
-                <button onClick={() => respond(i.invitationId, "REJECTED")}>Odrzuć</button>
-              </li>
+            .map((i, idx, arr) => (
+              <React.Fragment key={i.invitationId}>
+                <div className="invitation-item">
+                  <div className="invitation-text">
+                    Zaproszenie do wycieczki: <b>{i.trip?.destination}</b> od <b>{i.inviter?.firstName} {i.inviter?.lastName}</b>
+                  </div>
+                  <div className="invitation-buttons">
+                    <button onClick={() => respond(i.invitationId, "ACCEPTED")}>Akceptuj</button>
+                    <button onClick={() => respond(i.invitationId, "REJECTED")}>Odrzuć</button>
+                  </div>
+                </div>
+                {idx < arr.length - 1 && <hr className="invitation-divider" />}
+              </React.Fragment>
             ))}
-        </ul>
+        </div>
       )}
     </div>
   );
