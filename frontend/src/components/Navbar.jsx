@@ -6,6 +6,7 @@ const Navbar = ({ onLogout }) => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
+  const payload = JSON.parse(localStorage.getItem("payload"));
 
   const handleUserPanel = () => {
     setOpen(false);
@@ -37,6 +38,14 @@ const Navbar = ({ onLogout }) => {
             <button className="dropdown-item" onClick={handleUserPanel}>
               Panel użytkownika
             </button>
+            {payload?.roles?.includes("ROLE_ADMIN") && (
+              <button
+                className="dropdown-item"
+                onClick={() => (window.location.href = "/admin")}
+              >
+                Panel administratora
+              </button>
+            )}
             <hr className="dropdown-divider" />
             <button className="dropdown-item" onClick={onLogout}>
               Wyloguj

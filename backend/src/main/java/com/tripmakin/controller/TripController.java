@@ -4,6 +4,7 @@ import com.tripmakin.exception.ResourceNotFoundException;
 import com.tripmakin.model.Trip;
 import com.tripmakin.model.TripParticipant;
 import com.tripmakin.repository.TripParticipantRepository;
+import com.tripmakin.repository.TripRepository;
 import com.tripmakin.service.TripService;
 import com.tripmakin.security.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -94,6 +96,9 @@ public class TripController {
     @Autowired
     private TripParticipantRepository tripParticipantRepository;
 
+    @Autowired
+    private TripRepository tripRepository;
+
     @GetMapping("/{id}/participants")
     public List<TripParticipant> getTripParticipants(@PathVariable Integer id) {
         return tripParticipantRepository.findByTrip_TripId(id);
@@ -108,5 +113,11 @@ public class TripController {
         }
         tripParticipantRepository.delete(participant);
         return ResponseEntity.ok(Map.of("message", "Left the trip"));
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<Trip> getAllTrips() {
+        return tripRepository.findAll();
     }
 }

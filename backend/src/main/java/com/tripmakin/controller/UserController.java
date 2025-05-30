@@ -34,9 +34,10 @@ public class UserController {
 
     @Operation(summary = "Get all users", description = "Retrieve a list of all users")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved list of users")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<User>> getUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
     }
 
     @Operation(summary = "Get a user by ID", description = "Retrieve a specific user by their ID")
@@ -96,12 +97,9 @@ public class UserController {
         @ApiResponse(responseCode = "200", description = "User successfully deleted"),
         @ApiResponse(responseCode = "404", description = "User not found")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Integer id) {
-        User user = userService.getUserById(id);
-        if (user == null) {
-            throw new ResourceNotFoundException("User not found");
-        }
         userService.deleteUser(id);
         return ResponseEntity.ok(Map.of("message", "User deleted"));
     }

@@ -25,6 +25,12 @@ const LoginPage = ({ onLogin, onSwitchToRegister }) => {
       .then((data) => {
         localStorage.setItem("jwtToken", data.token); 
         localStorage.setItem("userId", data.userId);
+
+        const base64Url = data.token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const payload = JSON.parse(atob(base64));
+        localStorage.setItem("payload", JSON.stringify(payload));
+
         onLogin(data.token);
       })
       .catch((err) => alert(err.message));

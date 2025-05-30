@@ -1,0 +1,82 @@
+.admin-panel-container {
+  width: 70%;
+  margin: 90px auto 40px auto;
+  padding: 24px;
+  background: #f8f8f8;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px #0001;
+}
+
+.admin-back-btn {
+  margin-bottom: 20px;
+  background: #7fa88c;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+}
+.admin-back-btn:hover {
+  background: #345036;
+}
+
+.admin-panel-title {
+  text-align: left;
+  margin-bottom: 24px;
+  margin-left: 0;
+}
+
+.admin-users-box {
+  border: 1px solid #b2b2b2;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.admin-users-header {
+  text-align: left;
+  padding: 14px 18px;
+  background: #e0e0e0;
+  cursor: pointer;
+  font-weight: bold;
+  user-select: none;
+  font-size: 1.1rem;
+  margin-left: 0;
+}
+
+.admin-users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-users-table th,
+.admin-users-table td {
+  padding: 8px;
+  border: 1px solid #ccc;
+}
+
+.admin-users-table th {
+  background: #f4f4f4;
+}
+
+.admin-delete-btn {
+  background: #c0392b;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+.admin-delete-btn:hover {
+  background: #a93226;
+}
+
+.admin-users-loading,
+.admin-users-empty {
+  padding: 16px;
+  text-align: center;
+  color: #4a6b4a;
+}
