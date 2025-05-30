@@ -99,10 +99,9 @@ const UserPanel = () => {
   return (
     <>
       <Navbar onLogout={handleLogout} />
-      <div className="user-panel">
+      <div style={{ display: 'flex', justifyContent: 'flex-start', margin: '90px 0 1.5rem 2.5rem' }}>
         <button
           style={{
-            marginBottom: "1rem",
             background: "#7fa88c",
             color: "#fff",
             border: "none",
@@ -115,6 +114,8 @@ const UserPanel = () => {
         >
           ⬅ Cofnij
         </button>
+      </div>
+      <div className="user-panel">
         <h2>Panel użytkownika</h2>
         {!edit ? (
           <div>
