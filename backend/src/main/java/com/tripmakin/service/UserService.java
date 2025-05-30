@@ -49,7 +49,10 @@ public class UserService {
         existingUser.setLastName(updatedUser.getLastName());
         existingUser.setNickname(updatedUser.getNickname());
         existingUser.setEmail(updatedUser.getEmail());
-        existingUser.setPassword(updatedUser.getPassword());
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isBlank()
+            && !updatedUser.getPassword().equals(existingUser.getPassword())) {
+            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        }
         existingUser.setProfilePicture(updatedUser.getProfilePicture());
         existingUser.setPhoneNumber(updatedUser.getPhoneNumber());
         existingUser.setBio(updatedUser.getBio());

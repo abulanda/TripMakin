@@ -8,15 +8,20 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import org.springframework.util.StringUtils;
 
 @Tag(name = "Users", description = "Endpoints for managing users")
 @CrossOrigin(origins = "http://localhost:5173")
@@ -41,11 +46,14 @@ public class UserController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Integer id) {
-        User user = userService.getUserById(id);
-        if (user == null) {
-            throw new ResourceNotFoundException("User not found");
+        try {
+            User user = userService.getUserById(id);
+            return ResponseEntity.ok(user);
+        } catch (ResourceNotFoundException ex) {
+            return ResponseEntity.status(404).build();
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).build();
         }
-        return ResponseEntity.ok(user);
     }
 
     @Operation(summary = "Create a new user", description = "Add a new user to the system")
@@ -65,10 +73,20 @@ public class UserController {
         @ApiResponse(responseCode = "400", description = "Validation failed")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Integer id, @Valid @RequestBody User updatedUser) {
+    public ResponseEntity<User> updateUser(
+        @PathVariable Integer id,
+        @RequestPart("user") @Valid User updatedUser,
+        @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture
+    ) {
         User user = userService.getUserById(id);
         if (user == null) {
             throw new ResourceNotFoundException("User not found");
+        }
+        if (profilePicture != null && !profilePicture.isEmpty()) {
+            String fileName = saveProfilePicture(profilePicture, id);
+            updatedUser.setProfilePicture(fileName);
+        } else {
+            updatedUser.setProfilePicture(user.getProfilePicture());
         }
         return ResponseEntity.ok(userService.updateUser(id, updatedUser));
     }
@@ -100,5 +118,30 @@ public class UserController {
             throw new ResourceNotFoundException("User not found");
         }
         return ResponseEntity.ok(user);
+    }
+
+    private String saveProfilePicture(MultipartFile file, Integer userId) {
+        String uploadDir = "uploads/profile_pictures";
+        File dir = new File(uploadDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
+        String extension = "";
+        int dotIndex = originalFilename.lastIndexOf('.');
+        if (dotIndex > 0) {
+            extension = originalFilename.substring(dotIndex);
+        }
+        String fileName = "user_" + userId + extension;
+        File destination = new File(dir, fileName);
+
+        try {
+            file.transferTo(destination);
+        } catch (IOException e) {
+            throw new RuntimeException("Błąd podczas zapisu pliku profilowego", e);
+        }
+
+        return "/" + uploadDir + "/" + fileName;
     }
 }
