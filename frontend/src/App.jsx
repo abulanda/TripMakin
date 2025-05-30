@@ -39,12 +39,6 @@ function App() {
 
   return (
     <div className="App">
-      <button
-        onClick={handleLogout}
-        style={{ float: "right", margin: "1rem" }}
-      >
-        Wyloguj
-      </button>
       <Dashboard />
     </div>
   );
