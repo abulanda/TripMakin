@@ -17,12 +17,11 @@ const AddExpenseForm = ({ tripId, onExpenseAdded, participants }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("jwtToken");
     fetch("/api/expenses", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         ...form,

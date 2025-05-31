@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Navbar.css";
 
-const Navbar = ({ onLogout }) => {
+const Navbar = ({ onLogout, payload }) => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
-  const payload = JSON.parse(localStorage.getItem("payload"));
 
   const handleUserPanel = () => {
     setOpen(false);
@@ -38,14 +37,15 @@ const Navbar = ({ onLogout }) => {
             <button className="dropdown-item" onClick={handleUserPanel}>
               Panel użytkownika
             </button>
-            {payload?.roles?.includes("ROLE_ADMIN") && (
+            {payload?.roles?.includes("ROLE_ADMIN") ||
+            payload?.roles?.includes("ADMIN") ? (
               <button
                 className="dropdown-item"
                 onClick={() => (window.location.href = "/admin")}
               >
                 Panel administratora
               </button>
-            )}
+            ) : null}
             <hr className="dropdown-divider" />
             <button className="dropdown-item" onClick={onLogout}>
               Wyloguj

@@ -18,7 +18,6 @@ const AddScheduleForm = ({ tripId, onScheduleAdded }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("jwtToken");
     const userId = localStorage.getItem("userId");
     if (!userId || isNaN(Number(userId))) {
       alert("Brak informacji o użytkowniku. Zaloguj się ponownie.");
@@ -27,9 +26,9 @@ const AddScheduleForm = ({ tripId, onScheduleAdded }) => {
 
     fetch("/api/schedules", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         ...form,

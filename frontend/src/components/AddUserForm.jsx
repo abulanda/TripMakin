@@ -20,6 +20,7 @@ const AddUserForm = ({ onUserAdded }) => {
     console.log("Wysłano formularz:", formData);
     fetch("http://localhost:8081/api/users", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },

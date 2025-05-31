@@ -7,31 +7,63 @@ import UserPanel from "./components/UserPanel";
 import TripDetails from "./components/TripDetails";
 import AdminPanel from "./components/AdminPanel";
 import RequireAdmin from "./components/RequireAdmin";
+import Navbar from "./components/Navbar";
 import "./App.css";
 
 function App() {
-  const [token, setToken] = useState(localStorage.getItem("jwtToken"));
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [payload, setPayload] = useState(null);
 
   useEffect(() => {
-    setToken(localStorage.getItem("jwtToken"));
+    fetch("/api/auth/me", { credentials: "include" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.roles) {
+          setPayload(data);
+          localStorage.setItem("payload", JSON.stringify(data));
+          setIsLoggedIn(true);
+        } else {
+          setPayload(null);
+          localStorage.removeItem("payload");
+          setIsLoggedIn(false);
+        }
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  const handleLogin = (jwtToken) => {
-    setToken(jwtToken);
+  const handleLogin = () => {
+    fetch("/api/auth/me", { credentials: "include" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.roles) {
+          setPayload(data);
+          localStorage.setItem("payload", JSON.stringify(data));
+          setIsLoggedIn(true);
+        } else {
+          setPayload(null);
+          localStorage.removeItem("payload");
+          setIsLoggedIn(false);
+        }
+      });
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("jwtToken");
+    fetch("/api/auth/logout", { method: "POST", credentials: "include" })
+      .then(() => {
+        setIsLoggedIn(false);
+      });
     localStorage.removeItem("userId");
-    setToken(null);
   };
 
   const handleRegister = () => {
     setIsRegistering(false);
   };
 
-  if (!token) {
+  if (loading) return <div>Ładowanie...</div>;
+
+  if (!isLoggedIn) {
     return isRegistering ? (
       <RegisterPage onRegister={handleRegister} />
     ) : (
@@ -44,11 +76,22 @@ function App() {
 
   return (
     <div className="App">
+      <Navbar onLogout={handleLogout} payload={payload} />
       <Routes>
-        <Route path="/admin" element={<RequireAdmin><AdminPanel /></RequireAdmin>} />
+        <Route
+          path="/admin"
+          element={
+            <RequireAdmin payload={payload}>
+              <AdminPanel />
+            </RequireAdmin>
+          }
+        />
         <Route path="/users/:id" element={<UserPanel />} />
         <Route path="/trips/:id" element={<TripDetails />} />
-        <Route path="*" element={<Dashboard />} />
+        <Route
+          path="*"
+          element={<Dashboard payload={payload} onLogout={handleLogout} />}
+        />
       </Routes>
     </div>
   );

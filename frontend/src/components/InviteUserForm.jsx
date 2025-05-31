@@ -7,9 +7,8 @@ const InviteUserForm = ({ tripId, onUserInvited }) => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("jwtToken");
     fetch(`http://localhost:8081/api/trips/${tripId}/participants`, {
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: "include",
     })
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => setParticipants(data));
@@ -26,10 +25,11 @@ const InviteUserForm = ({ tripId, onUserInvited }) => {
       return;
     }
     setLoading(true);
-    const token = localStorage.getItem("jwtToken");
-    const inviterId = localStorage.getItem("userId");
+
+    const inviterId = Number(localStorage.getItem("userId"));
+
     fetch("/api/users/email/" + email, {
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: "include",
     })
       .then((res) =>
         res.ok ? res.json() : Promise.reject("Nie znaleziono użytkownika")
@@ -39,11 +39,11 @@ const InviteUserForm = ({ tripId, onUserInvited }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
+          credentials: "include",
           body: JSON.stringify({
             tripId: Number(tripId),
-            inviterId: Number(inviterId),
+            inviterId,
             invitedUserId: user.userId,
           }),
         });

@@ -11,12 +11,11 @@ const AdminPanel = () => {
   const [expandedUsers, setExpandedUsers] = useState(false);
   const [expandedTrips, setExpandedTrips] = useState(false);
   const navigate = useNavigate();
-  const token = localStorage.getItem("jwtToken");
 
   const fetchUsers = () => {
     setLoadingUsers(true);
     fetch("/api/users", {
-      headers: { Authorization: `Bearer ${token}` }
+      credentials: "include"
     })
       .then(res => {
         if (!res.ok) throw new Error("Błąd pobierania użytkowników");
@@ -35,7 +34,7 @@ const AdminPanel = () => {
   const fetchTrips = () => {
     setLoadingTrips(true);
     fetch("/api/trips/all", {
-      headers: { Authorization: `Bearer ${token}` }
+      credentials: "include"
     })
       .then(res => {
         if (!res.ok) throw new Error("Błąd pobierania wycieczek");
@@ -55,7 +54,7 @@ const AdminPanel = () => {
     if (!window.confirm("Na pewno usunąć użytkownika?")) return;
     fetch(`/api/users/${id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` }
+      credentials: "include"
     })
       .then(res => {
         if (res.ok) fetchUsers();
@@ -67,7 +66,7 @@ const AdminPanel = () => {
     if (!window.confirm("Na pewno usunąć wycieczkę?")) return;
     fetch(`/api/trips/${id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` }
+      credentials: "include"
     })
       .then(res => {
         if (res.ok) fetchTrips();
@@ -83,8 +82,8 @@ const AdminPanel = () => {
   return (
     <>
       <Navbar onLogout={() => {
-        localStorage.removeItem("jwtToken");
         localStorage.removeItem("userId");
+        localStorage.removeItem("payload");
         window.location.href = "/";
       }} />
       <div className="admin-panel-container">

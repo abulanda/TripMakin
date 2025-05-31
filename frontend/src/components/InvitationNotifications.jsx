@@ -3,23 +3,22 @@ import React, { useEffect, useState } from "react";
 const InvitationNotifications = ({ onInvitationResponded }) => {
   const [invitations, setInvitations] = useState([]);
   const userId = localStorage.getItem("userId");
-  const token = localStorage.getItem("jwtToken");
 
   useEffect(() => {
-    if (!userId || !token) return;
+    if (!userId) return;
     fetch(`/api/invitations/user/${userId}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: "include"
     })
       .then((res) => res.ok ? res.json() : [])
       .then(setInvitations);
-  }, [userId, token]);
+  }, [userId]);
 
   const respond = (invitationId, status) => {
     fetch(`/api/invitations/${invitationId}/respond`, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ status }),
     })

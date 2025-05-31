@@ -11,12 +11,8 @@ const UserPanel = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("jwtToken");
     fetch(`/api/users/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
+      credentials: "include",
     })
       .then(res => {
         if (!res.ok) throw new Error("Brak dostępu lub błąd pobierania danych użytkownika");
@@ -39,52 +35,48 @@ const UserPanel = () => {
   };
 
   const handleSave = (e) => {
-  e.preventDefault();
-  const token = localStorage.getItem("jwtToken");
-  const formData = new FormData();
+    e.preventDefault();
+    const formData = new FormData();
 
-  const userPayload = { ...form };
-  delete userPayload.profilePictureFile;
-  delete userPayload.createdAt;
-  delete userPayload.lastLoginAt;
-  delete userPayload.roles;
-  delete userPayload.isActive;
-  delete userPayload.userId;
-  delete userPayload.profilePicture;
-  if (
-    !form.password ||
-    form.password === user.password ||
-    (form.password && form.password.startsWith("$2a$"))
-  ) {
-    delete userPayload.password;
-  }
+    const userPayload = { ...form };
+    delete userPayload.profilePictureFile;
+    delete userPayload.createdAt;
+    delete userPayload.lastLoginAt;
+    delete userPayload.roles;
+    delete userPayload.isActive;
+    delete userPayload.userId;
+    delete userPayload.profilePicture;
+    if (
+      !form.password ||
+      form.password === user.password ||
+      (form.password && form.password.startsWith("$2a$"))
+    ) {
+      delete userPayload.password;
+    }
 
-  formData.append("user", JSON.stringify(userPayload));
-  if (form.profilePictureFile) {
-    formData.append("profilePicture", form.profilePictureFile);
-  }
+    formData.append("user", JSON.stringify(userPayload));
+    if (form.profilePictureFile) {
+      formData.append("profilePicture", form.profilePictureFile);
+    }
 
-  fetch(`/api/users/${id}`, {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: formData,
-  })
-    .then(res => {
-      if (!res.ok) throw new Error("Błąd podczas zapisu");
-      return res.json();
+    fetch(`/api/users/${id}`, {
+      method: "PUT",
+      credentials: "include",
+      body: formData,
     })
-    .then(data => {
-      setUser(data);
-      setEdit(false);
-      alert("Dane zapisane!");
-    })
-    .catch(err => alert(err.message));
-};
+      .then(res => {
+        if (!res.ok) throw new Error("Błąd podczas zapisu");
+        return res.json();
+      })
+      .then(data => {
+        setUser(data);
+        setEdit(false);
+        alert("Dane zapisane!");
+      })
+      .catch(err => alert(err.message));
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem("jwtToken");
     localStorage.removeItem("userId");
     window.location.href = "/";
   };

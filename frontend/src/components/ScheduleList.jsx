@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from "react";
+import AddScheduleForm from "./AddScheduleForm";
 
 const ScheduleList = ({ tripId }) => {
   const [schedules, setSchedules] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
 
-  useEffect(() => {
-    const token = localStorage.getItem("jwtToken");
+  const fetchSchedules = () => {
     fetch(`/api/schedules/trip/${tripId}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: "include",
     })
-      .then((res) => res.ok ? res.json() : [])
+      .then((res) => (res.ok ? res.json() : []))
       .then((data) => setSchedules(data));
+  };
+
+  useEffect(() => {
+    fetchSchedules();
   }, [tripId]);
 
   return (
@@ -54,12 +58,7 @@ const ScheduleList = ({ tripId }) => {
           tripId={tripId}
           onScheduleAdded={() => {
             setShowAdd(false);
-            const token = localStorage.getItem("jwtToken");
-            fetch(`/api/schedules/trip/${tripId}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            })
-              .then((res) => res.ok ? res.json() : [])
-              .then((data) => setSchedules(data));
+            fetchSchedules();
           }}
         />
       )}
@@ -68,5 +67,3 @@ const ScheduleList = ({ tripId }) => {
 };
 
 export default ScheduleList;
-
-import AddScheduleForm from "./AddScheduleForm";

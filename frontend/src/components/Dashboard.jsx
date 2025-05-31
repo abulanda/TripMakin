@@ -6,18 +6,14 @@ import InvitationNotifications from "./InvitationNotifications";
 import Navbar from "./Navbar";
 import NewsPanel from "./NewsPanel";
 
-const Dashboard = () => {
+const Dashboard = ({ payload, onLogout }) => {
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddTripForm, setShowAddTripForm] = useState(false);
 
   const fetchTrips = () => {
-    const token = localStorage.getItem("jwtToken");
     fetch("http://localhost:8081/api/trips", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: "include"
     })
       .then((res) => {
         if (!res.ok) {
@@ -44,19 +40,13 @@ const Dashboard = () => {
     fetchTrips();
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("jwtToken");
-    localStorage.removeItem("userId");
-    window.location.href = "/";
-  };
-
   if (loading) {
     return <p>Ładowanie danych...</p>;
   }
 
   return (
     <>
-      <Navbar onLogout={handleLogout} />
+      <Navbar onLogout={onLogout} payload={payload} />
       <div className="dashboard-panels">
         <div className="dashboard-left" style={{ flex: "1 1 25%" }}>
           <InvitationNotifications onInvitationResponded={fetchTrips} />

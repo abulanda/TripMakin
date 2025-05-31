@@ -16,39 +16,21 @@ const AddTripForm = ({ onTripAdded }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  function getEmailFromToken(token) {
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.sub;
-    } catch {
-      return null;
-    }
-  }
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("jwtToken");
-    if (!token) {
-      alert("Brak tokena JWT. Zaloguj się ponownie.");
-      return;
-    }
-    const email = getEmailFromToken(token);
-    if (!email) {
-      alert("Nie można pobrać emaila z tokena.");
-      return;
-    }
-    const tripData = {
-      ...formData,
-      createdBy: { email }, 
-    };
+    const payload = JSON.parse(localStorage.getItem("payload"));
+    const email = payload?.username;
 
     fetch("http://localhost:8081/api/trips", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(tripData),
+      credentials: "include",
+      body: JSON.stringify({
+        ...formData,
+        createdBy: { email },
+      }),
     })
       .then((res) => {
         if (!res.ok) throw new Error("Błąd podczas dodawania wycieczki");

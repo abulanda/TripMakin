@@ -16,9 +16,8 @@ const TripDetails = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("jwtToken");
     fetch(`/api/trips/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
@@ -27,13 +26,13 @@ const TripDetails = () => {
       });
 
     fetch(`/api/trips/${id}/participants`, {
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: "include",
     })
       .then((res) => res.ok ? res.json() : [])
       .then((data) => setParticipants(data));
 
     fetch(`/api/expenses/trip/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: "include",
     })
       .then((res) => res.ok ? res.json() : [])
       .then((data) => setExpenses(data));
@@ -50,7 +49,6 @@ const TripDetails = () => {
   );
 
   const handleLogout = () => {
-    localStorage.removeItem("jwtToken");
     localStorage.removeItem("userId");
     window.location.href = "/";
   };
@@ -93,9 +91,8 @@ const TripDetails = () => {
                 {showInviteUser && (
                   <InviteUserForm tripId={id} onUserInvited={() => {
                     setShowInviteUser(false);
-                    const token = localStorage.getItem("jwtToken");
                     fetch(`/api/trips/${id}/participants`, {
-                      headers: { Authorization: `Bearer ${token}` },
+                      credentials: "include",
                     })
                       .then((res) => res.ok ? res.json() : [])
                       .then((data) => setParticipants(data));
@@ -106,12 +103,11 @@ const TripDetails = () => {
             {myParticipant && myParticipant.role !== "OWNER" && (
               <button
                 onClick={() => {
-                  const token = localStorage.getItem("jwtToken");
                   fetch(
-                    `http://localhost:8081/api/trips/${id}/participants/${myParticipant.user.userId}`,
+                    `/api/trips/${id}/participants/${myParticipant.user.userId}`,
                     {
                       method: "DELETE",
-                      headers: { Authorization: `Bearer ${token}` },
+                      credentials: "include",
                     }
                   )
                     .then((res) => {
@@ -169,9 +165,8 @@ const TripDetails = () => {
             {showAddExpense && (
               <AddExpenseForm tripId={id} onExpenseAdded={() => {
                 setShowAddExpense(false);
-                const token = localStorage.getItem("jwtToken");
                 fetch(`/api/expenses/trip/${id}`, {
-                  headers: { Authorization: `Bearer ${token}` },
+                  credentials: "include",
                 })
                   .then((res) => res.ok ? res.json() : [])
                   .then((data) => setExpenses(data));
