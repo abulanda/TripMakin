@@ -8,7 +8,7 @@ const InviteUserForm = ({ tripId, onUserInvited }) => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    authFetch(`/api/trips/${tripId}/participants`, {
+    authFetch(`/api/v1/trips/${tripId}/participants`, {
       credentials: "include",
     })
       .then((res) => (res.ok ? res.json() : []))
@@ -29,14 +29,14 @@ const InviteUserForm = ({ tripId, onUserInvited }) => {
 
     const inviterId = Number(localStorage.getItem("userId"));
 
-    authFetch("/api/users/email/" + email, {
+    authFetch("/api/v1/users/email/" + email, {
       credentials: "include",
     })
       .then((res) =>
         res.ok ? res.json() : Promise.reject("Nie znaleziono użytkownika")
       )
       .then((user) => {
-        return authFetch("/api/invitations/send", {
+        return authFetch("/api/v1/invitations/send", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

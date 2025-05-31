@@ -20,7 +20,7 @@ const AddUserForm = ({ onUserAdded }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Wysłano formularz:", formData);
-    authFetch("/api/users", {
+    authFetch("/api/v1/users", {
       method: "POST",
       credentials: "include",
       headers: {

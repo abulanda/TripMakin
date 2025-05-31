@@ -25,7 +25,7 @@ const AddScheduleForm = ({ tripId, onScheduleAdded }) => {
       return;
     }
 
-    authFetch("/api/schedules", {
+    authFetch("/api/v1/schedules", {
       method: "POST",
       credentials: "include",
       headers: {

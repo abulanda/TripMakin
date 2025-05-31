@@ -13,7 +13,7 @@ const Dashboard = ({ payload, onLogout }) => {
   const [showAddTripForm, setShowAddTripForm] = useState(false);
 
   const fetchTrips = () => {
-    authFetch("/api/trips", {
+    authFetch("/api/v1/trips", {
       credentials: "include"
     })
       .then((res) => {

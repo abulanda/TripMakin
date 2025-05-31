@@ -6,7 +6,7 @@ const UserList = ({ refresh }) => {
   const [users, setUsers] = useState([]);
 
   const fetchUsers = () => {
-    authFetch("/api/users", { credentials: "include" })
+    authFetch("/api/v1/users", { credentials: "include" })
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => setUsers(data))
       .catch((err) => console.error("Błąd:", err));

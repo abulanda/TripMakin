@@ -7,7 +7,7 @@ const ScheduleList = ({ tripId }) => {
   const [showAdd, setShowAdd] = useState(false);
 
   const fetchSchedules = () => {
-    authFetch(`/api/schedules/trip/${tripId}`, {
+    authFetch(`/api/v1/schedules/trip/${tripId}`, {
       credentials: "include",
     })
       .then((res) => (res.ok ? res.json() : []))

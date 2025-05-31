@@ -16,7 +16,7 @@ const AdminPanel = () => {
 
   const fetchUsers = () => {
     setLoadingUsers(true);
-    authFetch("/api/users", {
+    authFetch("/api/v1/users", {
       credentials: "include"
     })
       .then(res => {
@@ -35,7 +35,7 @@ const AdminPanel = () => {
 
   const fetchTrips = () => {
     setLoadingTrips(true);
-    authFetch("/api/trips/all", {
+    authFetch("/api/v1/trips/all", {
       credentials: "include"
     })
       .then(res => {
@@ -54,7 +54,7 @@ const AdminPanel = () => {
 
   const handleDeleteUser = (id) => {
     if (!window.confirm("Na pewno usunąć użytkownika?")) return;
-    authFetch(`/api/users/${id}`, {
+    authFetch(`/api/v1/users/${id}`, {
       method: "DELETE",
       credentials: "include"
     })
@@ -66,7 +66,7 @@ const AdminPanel = () => {
 
   const handleDeleteTrip = (id) => {
     if (!window.confirm("Na pewno usunąć wycieczkę?")) return;
-    authFetch(`/api/trips/${id}`, {
+    authFetch(`/api/v1/trips/${id}`, {
       method: "DELETE",
       credentials: "include"
     })

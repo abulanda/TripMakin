@@ -17,7 +17,7 @@ const TripDetails = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    authFetch(`/api/trips/${id}`, {
+    authFetch(`/api/v1/trips/${id}`, {
       credentials: "include",
     })
       .then((res) => res.json())
@@ -26,13 +26,13 @@ const TripDetails = () => {
         setLoading(false);
       });
 
-    authFetch(`/api/trips/${id}/participants`, {
+    authFetch(`/api/v1/trips/${id}/participants`, {
       credentials: "include",
     })
       .then((res) => res.ok ? res.json() : [])
       .then((data) => setParticipants(data));
 
-    authFetch(`/api/expenses/trip/${id}`, {
+    authFetch(`/api/v1/expenses/trip/${id}`, {
       credentials: "include",
     })
       .then((res) => res.ok ? res.json() : [])
@@ -92,7 +92,7 @@ const TripDetails = () => {
                 {showInviteUser && (
                   <InviteUserForm tripId={id} onUserInvited={() => {
                     setShowInviteUser(false);
-                    authFetch(`/api/trips/${id}/participants`, {
+                    authFetch(`/api/v1/trips/${id}/participants`, {
                       credentials: "include",
                     })
                       .then((res) => res.ok ? res.json() : [])
@@ -105,7 +105,7 @@ const TripDetails = () => {
               <button
                 onClick={() => {
                   authFetch(
-                    `/api/trips/${id}/participants/${myParticipant.user.userId}`,
+                    `/api/v1/trips/${id}/participants/${myParticipant.user.userId}`,
                     {
                       method: "DELETE",
                       credentials: "include",
@@ -166,7 +166,7 @@ const TripDetails = () => {
             {showAddExpense && (
               <AddExpenseForm tripId={id} onExpenseAdded={() => {
                 setShowAddExpense(false);
-                authFetch(`/api/expenses/trip/${id}`, {
+                authFetch(`/api/v1/expenses/trip/${id}`, {
                   credentials: "include",
                 })
                   .then((res) => res.ok ? res.json() : [])

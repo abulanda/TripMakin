@@ -7,7 +7,7 @@ const InvitationNotifications = ({ onInvitationResponded }) => {
 
   useEffect(() => {
     if (!userId) return;
-    authFetch(`/api/invitations/user/${userId}`, {
+    authFetch(`/api/v1/invitations/user/${userId}`, {
       credentials: "include"
     })
       .then((res) => res.ok ? res.json() : [])
@@ -15,7 +15,7 @@ const InvitationNotifications = ({ onInvitationResponded }) => {
   }, [userId]);
 
   const respond = (invitationId, status) => {
-    authFetch(`/api/invitations/${invitationId}/respond`, {
+    authFetch(`/api/v1/invitations/${invitationId}/respond`, {
       method: "POST",
       credentials: "include",
       headers: {

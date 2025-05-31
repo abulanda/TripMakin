@@ -23,7 +23,7 @@ const RegisterPage = ({ onRegister }) => {
       return;
     }
 
-    fetch("/api/users", {
+    fetch("/api/v1/users", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

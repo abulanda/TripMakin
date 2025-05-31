@@ -27,7 +27,7 @@ import jakarta.validation.Valid;
 @Tag(name = "Trips", description = "Endpoints for managing trips")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
-@RequestMapping("/api/trips")
+@RequestMapping("/api/v1/trips")
 public class TripController {
 
     private final TripService tripService;

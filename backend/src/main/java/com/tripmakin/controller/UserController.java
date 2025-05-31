@@ -26,7 +26,7 @@ import org.springframework.util.StringUtils;
 @Tag(name = "Users", description = "Endpoints for managing users")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 public class UserController {
 
     @Autowired

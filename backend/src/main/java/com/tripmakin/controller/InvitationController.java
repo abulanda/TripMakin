@@ -8,7 +8,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/invitations")
+@RequestMapping("/api/v1/invitations")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class InvitationController {
     private final InvitationService invitationService;

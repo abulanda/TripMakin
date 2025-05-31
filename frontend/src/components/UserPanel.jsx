@@ -12,7 +12,7 @@ const UserPanel = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    authFetch(`/api/users/${id}`, {
+    authFetch(`/api/v1/users/${id}`, {
       credentials: "include",
     })
       .then(res => {
@@ -60,7 +60,7 @@ const UserPanel = () => {
       formData.append("profilePicture", form.profilePictureFile);
     }
 
-    authFetch(`/api/users/${id}`, {
+    authFetch(`/api/v1/users/${id}`, {
       method: "PUT",
       credentials: "include",
       body: formData,

@@ -23,7 +23,7 @@ const AddTripForm = ({ onTripAdded }) => {
     const payload = JSON.parse(localStorage.getItem("payload"));
     const email = payload?.username;
 
-    authFetch("/api/trips", {
+    authFetch("/api/v1/trips", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

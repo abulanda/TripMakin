@@ -17,7 +17,7 @@ function App() {
   const [payload, setPayload] = useState(null);
 
   useEffect(() => {
-    fetch("/api/auth/me", { credentials: "include" })
+    fetch("/api/v1/auth/me", { credentials: "include" })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data && data.roles) {
@@ -34,7 +34,7 @@ function App() {
   }, []);
 
   const handleLogin = () => {
-    fetch("/api/auth/me", { credentials: "include" })
+    fetch("/api/v1/auth/me", { credentials: "include" })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data && data.roles) {
@@ -50,7 +50,7 @@ function App() {
   };
 
   const handleLogout = () => {
-    fetch("/api/auth/logout", { method: "POST", credentials: "include" })
+    fetch("/api/v1/auth/logout", { method: "POST", credentials: "include" })
       .then(() => {
         setIsLoggedIn(false);
       });

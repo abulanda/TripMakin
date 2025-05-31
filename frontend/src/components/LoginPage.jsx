@@ -17,7 +17,7 @@ const LoginPage = ({ onLogin, onSwitchToRegister }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    authFetch("/api/auth/login", {
+    authFetch("/api/v1/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

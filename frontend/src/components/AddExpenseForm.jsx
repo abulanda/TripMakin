@@ -18,7 +18,7 @@ const AddExpenseForm = ({ tripId, onExpenseAdded, participants }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    authFetch("/api/expenses", {
+    authFetch("/api/v1/expenses", {
       method: "POST",
       credentials: "include",
       headers: {
