@@ -24,7 +24,7 @@ import java.util.Map;
 import org.springframework.util.StringUtils;
 
 @Tag(name = "Users", description = "Endpoints for managing users")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/users")
 public class UserController {

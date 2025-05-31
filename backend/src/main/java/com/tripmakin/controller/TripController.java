@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.Map;
 import jakarta.validation.Valid;
 
 @Tag(name = "Trips", description = "Endpoints for managing trips")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/trips")
 public class TripController {
@@ -37,8 +39,8 @@ public class TripController {
     @Operation(summary = "Get all trips", description = "Retrieve a list of all trips")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved list of trips")
     @GetMapping
-    public ResponseEntity<List<Trip>> getTrips(@RequestHeader("Authorization") String authHeader) {
-        String email = JwtUtil.getEmailFromAuthHeader(authHeader);
+    public ResponseEntity<List<Trip>> getTrips(Authentication authentication) {
+        String email = authentication.getName();
         return ResponseEntity.ok(tripService.getTripsForUser(email));
     }
 

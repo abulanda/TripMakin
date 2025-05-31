@@ -5,6 +5,10 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Schema(description = "User entity representing a user in the system")
 @Entity
@@ -161,4 +165,6 @@ public class User {
     public void setRoles(Set<String> roles) {
         this.roles = roles;
     }
+
+
 }

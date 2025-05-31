@@ -19,6 +19,7 @@ import java.util.Map;
 import jakarta.validation.Valid;
 
 @Tag(name = "Expenses", description = "Endpoints for managing expenses")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/expenses")
 public class ExpensesController {
