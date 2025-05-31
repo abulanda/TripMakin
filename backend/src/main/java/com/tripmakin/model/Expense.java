@@ -8,7 +8,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Entity
-@Table(name = "expenses")
+@Table(
+    name = "expenses",
+    indexes = {
+        @Index(name = "idx_expenses_trip_id", columnList = "trip_id"),
+        @Index(name = "idx_expenses_user_id", columnList = "user_id")
+    }
+)
 public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

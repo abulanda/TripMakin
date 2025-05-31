@@ -12,7 +12,13 @@ import java.util.stream.Collectors;
 
 @Schema(description = "User entity representing a user in the system")
 @Entity
-@Table(name = "users")
+@Table(
+    name = "users",
+    indexes = {
+        @Index(name = "idx_users_email", columnList = "email"),
+        @Index(name = "idx_users_user_id", columnList = "user_id")
+    }
+)
 public class User {
 
     @Id

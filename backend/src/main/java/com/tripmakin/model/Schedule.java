@@ -5,7 +5,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "schedules")
+@Table(
+    name = "schedules",
+    indexes = {
+        @Index(name = "idx_schedules_trip_id", columnList = "trip_id")
+    }
+)
 public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
