@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
+import { authFetch } from "../utils/authFetch";
 
 const UserPanel = () => {
   const { id } = useParams();
@@ -11,7 +12,7 @@ const UserPanel = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/users/${id}`, {
+    authFetch(`/api/users/${id}`, {
       credentials: "include",
     })
       .then(res => {
@@ -59,7 +60,7 @@ const UserPanel = () => {
       formData.append("profilePicture", form.profilePictureFile);
     }
 
-    fetch(`/api/users/${id}`, {
+    authFetch(`/api/users/${id}`, {
       method: "PUT",
       credentials: "include",
       body: formData,

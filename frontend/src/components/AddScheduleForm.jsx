@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { authFetch } from "../utils/authFetch";
 
 const AddScheduleForm = ({ tripId, onScheduleAdded }) => {
   const [form, setForm] = useState({
@@ -24,7 +25,7 @@ const AddScheduleForm = ({ tripId, onScheduleAdded }) => {
       return;
     }
 
-    fetch("/api/schedules", {
+    authFetch("/api/schedules", {
       method: "POST",
       credentials: "include",
       headers: {

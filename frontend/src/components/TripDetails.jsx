@@ -4,6 +4,7 @@ import AddExpenseForm from "./AddExpenseForm";
 import ScheduleList from "./ScheduleList";
 import InviteUserForm from "./InviteUserForm";
 import Navbar from "./Navbar";
+import { authFetch } from "../utils/authFetch";
 import "./TripDetails.css";
 
 const TripDetails = () => {
@@ -16,7 +17,7 @@ const TripDetails = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/trips/${id}`, {
+    authFetch(`/api/trips/${id}`, {
       credentials: "include",
     })
       .then((res) => res.json())
@@ -25,13 +26,13 @@ const TripDetails = () => {
         setLoading(false);
       });
 
-    fetch(`/api/trips/${id}/participants`, {
+    authFetch(`/api/trips/${id}/participants`, {
       credentials: "include",
     })
       .then((res) => res.ok ? res.json() : [])
       .then((data) => setParticipants(data));
 
-    fetch(`/api/expenses/trip/${id}`, {
+    authFetch(`/api/expenses/trip/${id}`, {
       credentials: "include",
     })
       .then((res) => res.ok ? res.json() : [])
@@ -91,7 +92,7 @@ const TripDetails = () => {
                 {showInviteUser && (
                   <InviteUserForm tripId={id} onUserInvited={() => {
                     setShowInviteUser(false);
-                    fetch(`/api/trips/${id}/participants`, {
+                    authFetch(`/api/trips/${id}/participants`, {
                       credentials: "include",
                     })
                       .then((res) => res.ok ? res.json() : [])
@@ -103,7 +104,7 @@ const TripDetails = () => {
             {myParticipant && myParticipant.role !== "OWNER" && (
               <button
                 onClick={() => {
-                  fetch(
+                  authFetch(
                     `/api/trips/${id}/participants/${myParticipant.user.userId}`,
                     {
                       method: "DELETE",
@@ -165,7 +166,7 @@ const TripDetails = () => {
             {showAddExpense && (
               <AddExpenseForm tripId={id} onExpenseAdded={() => {
                 setShowAddExpense(false);
-                fetch(`/api/expenses/trip/${id}`, {
+                authFetch(`/api/expenses/trip/${id}`, {
                   credentials: "include",
                 })
                   .then((res) => res.ok ? res.json() : [])

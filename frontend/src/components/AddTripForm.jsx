@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import "./AddTripForm.css";
+import { authFetch } from "../utils/authFetch";
+
 
 const AddTripForm = ({ onTripAdded }) => {
   const [formData, setFormData] = useState({
@@ -21,7 +23,7 @@ const AddTripForm = ({ onTripAdded }) => {
     const payload = JSON.parse(localStorage.getItem("payload"));
     const email = payload?.username;
 
-    fetch("http://localhost:8081/api/trips", {
+    authFetch("/api/trips", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

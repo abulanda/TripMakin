@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { authFetch } from "../utils/authFetch";
 
 const InvitationNotifications = ({ onInvitationResponded }) => {
   const [invitations, setInvitations] = useState([]);
@@ -6,7 +7,7 @@ const InvitationNotifications = ({ onInvitationResponded }) => {
 
   useEffect(() => {
     if (!userId) return;
-    fetch(`/api/invitations/user/${userId}`, {
+    authFetch(`/api/invitations/user/${userId}`, {
       credentials: "include"
     })
       .then((res) => res.ok ? res.json() : [])
@@ -14,7 +15,7 @@ const InvitationNotifications = ({ onInvitationResponded }) => {
   }, [userId]);
 
   const respond = (invitationId, status) => {
-    fetch(`/api/invitations/${invitationId}/respond`, {
+    authFetch(`/api/invitations/${invitationId}/respond`, {
       method: "POST",
       credentials: "include",
       headers: {

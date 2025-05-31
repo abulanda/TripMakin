@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
 import "./AdminPanel.css";
+import { authFetch } from "../utils/authFetch";
+
 
 const AdminPanel = () => {
   const [users, setUsers] = useState([]);
@@ -14,7 +16,7 @@ const AdminPanel = () => {
 
   const fetchUsers = () => {
     setLoadingUsers(true);
-    fetch("/api/users", {
+    authFetch("/api/users", {
       credentials: "include"
     })
       .then(res => {
@@ -33,7 +35,7 @@ const AdminPanel = () => {
 
   const fetchTrips = () => {
     setLoadingTrips(true);
-    fetch("/api/trips/all", {
+    authFetch("/api/trips/all", {
       credentials: "include"
     })
       .then(res => {
@@ -52,7 +54,7 @@ const AdminPanel = () => {
 
   const handleDeleteUser = (id) => {
     if (!window.confirm("Na pewno usunąć użytkownika?")) return;
-    fetch(`/api/users/${id}`, {
+    authFetch(`/api/users/${id}`, {
       method: "DELETE",
       credentials: "include"
     })
@@ -64,7 +66,7 @@ const AdminPanel = () => {
 
   const handleDeleteTrip = (id) => {
     if (!window.confirm("Na pewno usunąć wycieczkę?")) return;
-    fetch(`/api/trips/${id}`, {
+    authFetch(`/api/trips/${id}`, {
       method: "DELETE",
       credentials: "include"
     })

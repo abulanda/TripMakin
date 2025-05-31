@@ -3,10 +3,12 @@ package com.tripmakin.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
 
+@Component
 public class JwtUtil {
     private static final String SECRET = "tripmakin-super-secret-key-tripmakin";
     private static final long EXPIRATION_TIME = 86400000;

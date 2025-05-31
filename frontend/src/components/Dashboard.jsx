@@ -5,6 +5,7 @@ import AddTripForm from "./AddTripForm";
 import InvitationNotifications from "./InvitationNotifications";
 import Navbar from "./Navbar";
 import NewsPanel from "./NewsPanel";
+import { authFetch } from "../utils/authFetch";
 
 const Dashboard = ({ payload, onLogout }) => {
   const [trips, setTrips] = useState([]);
@@ -12,7 +13,7 @@ const Dashboard = ({ payload, onLogout }) => {
   const [showAddTripForm, setShowAddTripForm] = useState(false);
 
   const fetchTrips = () => {
-    fetch("http://localhost:8081/api/trips", {
+    authFetch("/api/trips", {
       credentials: "include"
     })
       .then((res) => {

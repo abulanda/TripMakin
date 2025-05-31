@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { authFetch } from "../utils/authFetch";
 
 const UserList = ({ refresh }) => {
   const [users, setUsers] = useState([]);
 
   const fetchUsers = () => {
-    fetch("/api/users")
-      .then((res) => res.json())
+    authFetch("/api/users", { credentials: "include" })
+      .then((res) => (res.ok ? res.json() : []))
       .then((data) => setUsers(data))
       .catch((err) => console.error("Błąd:", err));
   };

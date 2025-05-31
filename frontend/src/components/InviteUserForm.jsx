@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { authFetch } from "../utils/authFetch";
 
 const InviteUserForm = ({ tripId, onUserInvited }) => {
   const [email, setEmail] = useState("");
@@ -7,7 +8,7 @@ const InviteUserForm = ({ tripId, onUserInvited }) => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(`http://localhost:8081/api/trips/${tripId}/participants`, {
+    authFetch(`/api/trips/${tripId}/participants`, {
       credentials: "include",
     })
       .then((res) => (res.ok ? res.json() : []))
@@ -28,14 +29,14 @@ const InviteUserForm = ({ tripId, onUserInvited }) => {
 
     const inviterId = Number(localStorage.getItem("userId"));
 
-    fetch("/api/users/email/" + email, {
+    authFetch("/api/users/email/" + email, {
       credentials: "include",
     })
       .then((res) =>
         res.ok ? res.json() : Promise.reject("Nie znaleziono użytkownika")
       )
       .then((user) => {
-        return fetch("/api/invitations/send", {
+        return authFetch("/api/invitations/send", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

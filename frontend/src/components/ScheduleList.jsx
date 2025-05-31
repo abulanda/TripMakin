@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import AddScheduleForm from "./AddScheduleForm";
+import { authFetch } from "../utils/authFetch";
 
 const ScheduleList = ({ tripId }) => {
   const [schedules, setSchedules] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
 
   const fetchSchedules = () => {
-    fetch(`/api/schedules/trip/${tripId}`, {
+    authFetch(`/api/schedules/trip/${tripId}`, {
       credentials: "include",
     })
       .then((res) => (res.ok ? res.json() : []))

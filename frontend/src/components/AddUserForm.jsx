@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { authFetch } from "../utils/authFetch";
+
 
 const AddUserForm = ({ onUserAdded }) => {
   const [formData, setFormData] = useState({
@@ -18,7 +20,7 @@ const AddUserForm = ({ onUserAdded }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Wysłano formularz:", formData);
-    fetch("http://localhost:8081/api/users", {
+    authFetch("/api/users", {
       method: "POST",
       credentials: "include",
       headers: {

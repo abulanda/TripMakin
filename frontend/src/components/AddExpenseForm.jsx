@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { authFetch } from "../utils/authFetch";
 
 const AddExpenseForm = ({ tripId, onExpenseAdded, participants }) => {
   const [form, setForm] = useState({
@@ -17,7 +18,7 @@ const AddExpenseForm = ({ tripId, onExpenseAdded, participants }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch("/api/expenses", {
+    authFetch("/api/expenses", {
       method: "POST",
       credentials: "include",
       headers: {

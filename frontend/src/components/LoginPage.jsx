@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
+import { authFetch } from "../utils/authFetch";
 
 const LoginPage = ({ onLogin, onSwitchToRegister }) => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const navigate = useNavigate();
+
+  const params = new URLSearchParams(window.location.search);
+  const sessionExpired = params.get("sessionExpired");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -13,7 +17,7 @@ const LoginPage = ({ onLogin, onSwitchToRegister }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch("/api/auth/login", {
+    authFetch("/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,6 +43,11 @@ const LoginPage = ({ onLogin, onSwitchToRegister }) => {
         <img src="/logo.svg" alt="Logo" className="logo" />
         <div className="login-container">
           <h1>Let's begin your journey!</h1>
+          {sessionExpired && (
+            <div className="session-expired-msg">
+              Sesja wygasła. Zaloguj się ponownie.
+            </div>
+          )}
           <form onSubmit={handleSubmit}>
             <input
               type="text"
