@@ -8,6 +8,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import lombok.Getter;
+import lombok.Setter;
+
 
 @Entity
 @Table(
@@ -17,6 +20,8 @@ import jakarta.validation.constraints.Size;
         @Index(name = "idx_trips_created_by", columnList = "created_by")
     }
 )
+@Getter
+@Setter
 public class Trip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,61 +67,4 @@ public class Trip {
 
     public Trip() {}
 
-    
-    public Integer getTripId() {
-        return tripId;
-    }
-    public void setTripId(Integer tripId) {
-        this.tripId = tripId;
-    }
-
-    public String getDestination() {
-        return destination;
-    }
-    public void setDestination(String destination) {
-        this.destination = destination;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }   
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getCoverPhoto() {
-        return coverPhoto;
-    }
-    public void setCoverPhoto(String coverPhoto) {
-        this.coverPhoto = coverPhoto;
-    }
-
-    public User getCreatedBy() {
-        return createdBy;
-    }
-    public void setCreatedBy(User createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-    public void setStatus(String status) {
-        this.status = status;
-    }
-    
 }

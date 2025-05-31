@@ -2,6 +2,8 @@ package com.tripmakin.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(
@@ -13,6 +15,8 @@ import java.time.LocalDateTime;
         @Index(name = "idx_invitations_status", columnList = "status")
     }
 )
+@Getter
+@Setter
 public class Invitation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,42 +41,5 @@ public class Invitation {
     public Invitation() {
         this.status = "PENDING";
         this.sentAt = LocalDateTime.now();
-    }
-
-    public Integer getInvitationId() {
-        return invitationId;
-    }
-    public void setInvitationId(Integer invitationId) {
-        this.invitationId = invitationId;
-    }
-    public Trip getTrip() {
-        return trip;
-    }
-    public void setTrip(Trip trip) {
-        this.trip = trip;
-    }
-    public User getInvitedUser() {
-        return invitedUser;
-    }
-    public void setInvitedUser(User invitedUser) {
-        this.invitedUser = invitedUser;
-    }
-    public User getInviter() {
-        return inviter;
-    }
-    public void setInviter(User inviter) {
-        this.inviter = inviter;
-    }
-    public String getStatus() {
-        return status;
-    }
-    public void setStatus(String status) {
-        this.status = status;
-    }
-    public LocalDateTime getSentAt() {
-        return sentAt;
-    }
-    public void setSentAt(LocalDateTime sentAt) {
-        this.sentAt = sentAt;
     }
 }

@@ -7,6 +7,9 @@ import java.time.LocalDate;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Entity
 @Table(
     name = "expenses",
@@ -15,6 +18,8 @@ import jakarta.validation.constraints.Size;
         @Index(name = "idx_expenses_user_id", columnList = "user_id")
     }
 )
+@Getter
+@Setter
 public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,69 +62,6 @@ public class Expense {
 
     public Expense() {
         this.isSettled = false;
-    }
-
-    public Integer getExpenseId() {
-        return expenseId;
-    }
-    public void setExpenseId(Integer expenseId) {
-        this.expenseId = expenseId;
-    }
-
-    public Trip getTrip() {
-        return trip;
-    }
-    public void setTrip(Trip trip) {
-        this.trip = trip;
-    }
-
-    public User getUser() {
-        return user;
-    }
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
-    public Boolean getIsSettled() {
-        return isSettled;
-    }
-    public void setIsSettled(Boolean isSettled) {
-        this.isSettled = isSettled;
     }
 
 }
