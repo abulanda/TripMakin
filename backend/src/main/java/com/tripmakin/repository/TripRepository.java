@@ -1,6 +1,8 @@
 package com.tripmakin.repository;
 
 import com.tripmakin.model.Trip;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,4 +18,8 @@ public interface TripRepository extends JpaRepository<Trip, Integer> {
 
     @Query("SELECT t FROM Trip t WHERE t.tripId IN (SELECT tp.trip.tripId FROM TripParticipant tp WHERE tp.user.userId = :userId)")
     List<Trip> findAllByUserId(@Param("userId") Integer userId);
+
+    Page<Trip> findByStatus(String status, Pageable pageable);
+
+    Page<Trip> findAll(Pageable pageable);
 }

@@ -80,3 +80,23 @@
   text-align: center;
   color: #4a6b4a;
 }
+
+.admin-panel-container select {
+  background: #3a5b3c;
+  color: #fff;
+  border: 1.5px solid #345036;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 1rem;
+  margin-right: 8px;
+}
+
+.admin-panel-container select:focus {
+  outline: 2px solid #7fa88c;
+  background: #345036;
+}
+
+.admin-panel-container option {
+  background: #fff;
+  color: #3a5b3c;
+}

@@ -14,6 +14,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -39,9 +43,16 @@ public class TripController {
     @Operation(summary = "Get all trips", description = "Retrieve a list of all trips")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved list of trips")
     @GetMapping
-    public ResponseEntity<List<Trip>> getTrips(Authentication authentication) {
-        String email = authentication.getName();
-        return ResponseEntity.ok(tripService.getTripsForUser(email));
+    public ResponseEntity<Page<Trip>> getTrips(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "tripId,asc") String[] sort,
+        @RequestParam(required = false) String status
+    ) {
+        Sort.Direction direction = sort[1].equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sort[0]));
+        Page<Trip> trips = tripService.getTrips(pageable, status);
+        return ResponseEntity.ok(trips);
     }
 
     @Operation(summary = "Get a trip by ID", description = "Retrieve a specific trip by its ID")
@@ -121,5 +132,11 @@ public class TripController {
     @PreAuthorize("hasRole('ADMIN')")
     public List<Trip> getAllTrips() {
         return tripRepository.findAll();
+    }
+
+    @GetMapping("/my")
+    public List<Trip> getMyTrips(Authentication authentication) {
+        String email = authentication.getName();
+        return tripService.getTripsForUser(email);
     }
 }

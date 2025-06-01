@@ -8,6 +8,8 @@ import com.tripmakin.repository.TripParticipantRepository;
 import com.tripmakin.repository.TripRepository;
 import com.tripmakin.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -102,5 +104,12 @@ public class TripService {
             }
         }
         return trips;
+    }
+
+    public Page<Trip> getTrips(Pageable pageable, String status) {
+        if (status != null && !status.isEmpty()) {
+            return tripRepository.findByStatus(status, pageable);
+        }
+        return tripRepository.findAll(pageable);
     }
 }
