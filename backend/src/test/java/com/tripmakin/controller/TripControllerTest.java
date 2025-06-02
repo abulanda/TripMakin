@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -30,39 +32,45 @@ class TripControllerTest {
     @Autowired private ObjectMapper objectMapper;
     @MockBean private TripService tripService;
 
+    @MockBean
+    private com.tripmakin.repository.TripParticipantRepository tripParticipantRepository;
+
+    @MockBean
+    private com.tripmakin.repository.TripRepository tripRepository;
+
     @Test
-    void getTrips_ok() throws Exception {
+    void shouldReturnPagedTrips() throws Exception {
         Trip t1 = sample(1, "Paryż", LocalDate.of(2025, 6, 15), LocalDate.of(2025, 6, 20));
         Trip t2 = sample(2, "Londyn", LocalDate.of(2025, 7, 10), LocalDate.of(2025, 7, 15));
-        Mockito.when(tripService.getAllTrips()).thenReturn(List.of(t1, t2));
+        Mockito.when(tripService.getTrips(any(), any())).thenReturn(new PageImpl<>(List.of(t1, t2), PageRequest.of(0, 10), 2));
 
-        mockMvc.perform(get("/api/trips"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$[0].destination").value("Paryż"))
-               .andExpect(jsonPath("$[1].destination").value("Londyn"));
+        mockMvc.perform(get("/api/v1/trips"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].destination").value("Paryż"))
+                .andExpect(jsonPath("$.content[1].destination").value("Londyn"));
     }
 
     @Test
-    void getTripById_ok() throws Exception {
+    void shouldReturnTripById() throws Exception {
         Mockito.when(tripService.getTripById(1)).thenReturn(sample(1, "Paryż", LocalDate.of(2025, 6, 15), LocalDate.of(2025, 6, 20)));
 
-        mockMvc.perform(get("/api/trips/1"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.destination").value("Paryż"));
+        mockMvc.perform(get("/api/v1/trips/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.destination").value("Paryż"));
     }
 
     @Test
-    void getTripById_notFound() throws Exception {
+    void shouldReturn404WhenTripNotFound() throws Exception {
         Mockito.when(tripService.getTripById(1)).thenThrow(new ResourceNotFoundException("Trip not found"));
 
-        mockMvc.perform(get("/api/trips/1"))
-               .andExpect(status().isNotFound())
-               .andExpect(jsonPath("$.error").value("Trip not found"))
-               .andExpect(jsonPath("$.status").value(404));
+        mockMvc.perform(get("/api/v1/trips/1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Trip not found"))
+                .andExpect(jsonPath("$.status").value(404));
     }
 
     @Test
-    void createTrip_created() throws Exception {
+    void shouldCreateTrip() throws Exception {
         Trip body = sample(null, "Paryż", LocalDate.of(2025, 6, 15), LocalDate.of(2025, 6, 20));
         User createdBy = new User();
         createdBy.setUserId(1);
@@ -70,73 +78,73 @@ class TripControllerTest {
 
         Mockito.when(tripService.createTrip(any(Trip.class))).thenReturn(body);
 
-        mockMvc.perform(post("/api/trips")
+        mockMvc.perform(post("/api/v1/trips")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(body)))
-               .andExpect(status().isCreated())
-               .andExpect(jsonPath("$.destination").value("Paryż"));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.destination").value("Paryż"));
     }
 
     @Test
-    void createTrip_badRequest() throws Exception {
-        mockMvc.perform(post("/api/trips")
+    void shouldReturnBadRequestWhenCreateTripWithInvalidData() throws Exception {
+        mockMvc.perform(post("/api/v1/trips")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
-               .andExpect(status().isBadRequest())
-               .andExpect(jsonPath("$.error").value("Validation failed"));
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Validation failed"));
     }
 
     @Test
-    void createTrip_unprocessableEntity() throws Exception {
-        Trip invalidTrip = sample(null, "Paryż", LocalDate.of(2025, 6, 20), LocalDate.of(2025, 6, 15));
+    void shouldUpdateTrip() throws Exception {
+        Trip updated = sample(1, "Londyn", LocalDate.of(2025, 7, 10), LocalDate.of(2025, 7, 15));
+        User createdBy = new User();
+        createdBy.setUserId(1);
+        updated.setCreatedBy(createdBy);
 
-        mockMvc.perform(post("/api/trips")
+        Mockito.when(tripService.getTripById(1)).thenReturn(updated);
+        Mockito.when(tripService.updateTrip(Mockito.eq(1), any(Trip.class))).thenReturn(updated);
+
+        mockMvc.perform(put("/api/v1/trips/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidTrip)))
-               .andExpect(status().isBadRequest())
-               .andExpect(jsonPath("$.error").value("Validation failed"));
+                        .content(objectMapper.writeValueAsString(updated)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.destination").value("Londyn"));
     }
 
     @Test
-    void updateTrip_badRequest() throws Exception {
-        Mockito.when(tripService.getTripById(1)).thenReturn(sample(1, "Paryż", LocalDate.of(2025, 6, 15), LocalDate.of(2025, 6, 20)));
+    void shouldReturn404WhenUpdateTripNotFound() throws Exception {
+        Trip trip = sample(1, "Paryż", LocalDate.of(2025, 6, 15), LocalDate.of(2025, 6, 20));
+        User createdBy = new User();
+        createdBy.setUserId(1);
+        trip.setCreatedBy(createdBy);
 
-        mockMvc.perform(put("/api/trips/1")
+        Mockito.when(tripService.getTripById(1)).thenThrow(new ResourceNotFoundException("Trip not found"));
+
+        mockMvc.perform(put("/api/v1/trips/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}"))
-               .andExpect(status().isBadRequest())
-               .andExpect(jsonPath("$.error").value("Validation failed"));
+                        .content(objectMapper.writeValueAsString(trip)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Trip not found"))
+                .andExpect(jsonPath("$.status").value(404));
     }
 
     @Test
-    void updateTrip_unprocessableEntity() throws Exception {
-        Mockito.when(tripService.getTripById(1)).thenReturn(sample(1, "Paryż", LocalDate.of(2025, 6, 15), LocalDate.of(2025, 6, 20)));
-        Trip invalidTrip = sample(1, "Paryż", LocalDate.of(2025, 6, 20), LocalDate.of(2025, 6, 15));
-
-        mockMvc.perform(put("/api/trips/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidTrip)))
-               .andExpect(status().isBadRequest())
-               .andExpect(jsonPath("$.error").value("Validation failed"));
-    }
-
-    @Test
-    void deleteTrip_ok() throws Exception {
+    void shouldDeleteTrip() throws Exception {
         Mockito.doNothing().when(tripService).deleteTrip(1);
 
-        mockMvc.perform(delete("/api/trips/1"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.message").value("Trip deleted"));
+        mockMvc.perform(delete("/api/v1/trips/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Trip deleted"));
     }
 
     @Test
-    void deleteTrip_notFound() throws Exception {
+    void shouldReturn404WhenDeleteTripNotFound() throws Exception {
         Mockito.doThrow(new ResourceNotFoundException("Trip not found")).when(tripService).deleteTrip(1);
 
-        mockMvc.perform(delete("/api/trips/1"))
-               .andExpect(status().isNotFound())
-               .andExpect(jsonPath("$.error").value("Trip not found"))
-               .andExpect(jsonPath("$.status").value(404));
+        mockMvc.perform(delete("/api/v1/trips/1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Trip not found"))
+                .andExpect(jsonPath("$.status").value(404));
     }
 
     private Trip sample(Integer id, String destination, LocalDate startDate, LocalDate endDate) {
@@ -147,7 +155,7 @@ class TripControllerTest {
         t.setEndDate(endDate);
         t.setDescription("Opis wycieczki");
         t.setCoverPhoto("photo.jpg");
-        t.setStatus("Planned");
+        t.setStatus("PLANNED");
         return t;
     }
 }

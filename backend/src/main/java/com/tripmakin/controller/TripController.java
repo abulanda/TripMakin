@@ -90,7 +90,9 @@ public class TripController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<Trip> updateTrip(@PathVariable Integer id, @Valid @RequestBody Trip updatedTrip) {
-        return ResponseEntity.ok(tripService.updateTrip(id, updatedTrip));
+        tripService.getTripById(id);
+        Trip trip = tripService.updateTrip(id, updatedTrip);
+        return ResponseEntity.ok(trip);
     }
 
     @Operation(summary = "Delete a trip", description = "Remove a trip from the system")

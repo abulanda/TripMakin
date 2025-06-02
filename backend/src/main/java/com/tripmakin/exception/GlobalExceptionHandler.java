@@ -7,24 +7,17 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleResourceNotFoundException(ResourceNotFoundException ex,
-                                                        HttpServletRequest req) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(Map.of(
-                        "error", ex.getMessage(),
-                        "status", 404,
-                        "path", req.getRequestURI()
-                ));
+    public ResponseEntity<?> handleNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity.status(404).body(Map.of("error", ex.getMessage(), "status", 404));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

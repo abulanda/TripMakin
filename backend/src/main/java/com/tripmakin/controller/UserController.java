@@ -58,14 +58,8 @@ public class UserController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Integer id) {
-        try {
-            User user = userService.getUserById(id);
-            return ResponseEntity.ok(user);
-        } catch (ResourceNotFoundException ex) {
-            return ResponseEntity.status(404).build();
-        } catch (Exception ex) {
-            return ResponseEntity.status(500).build();
-        }
+        User user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
     }
 
     @Operation(summary = "Create a new user", description = "Add a new user to the system")
@@ -111,6 +105,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Integer id) {
+        userService.getUserById(id);
         userService.deleteUser(id);
         return ResponseEntity.ok(Map.of("message", "User deleted"));
     }

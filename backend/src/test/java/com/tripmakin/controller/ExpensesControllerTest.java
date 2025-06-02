@@ -33,100 +33,112 @@ class ExpensesControllerTest {
     @MockBean private ExpenseService expenseService;
 
     @Test
-    void getExpenses_ok() throws Exception {
+    void shouldReturnAllExpenses() throws Exception {
         Expense e1 = sample(1, "Bilet lotniczy", BigDecimal.valueOf(1500), "Transport");
         Expense e2 = sample(2, "Hotel", BigDecimal.valueOf(2000), "Accommodation");
         Mockito.when(expenseService.getAllExpenses()).thenReturn(List.of(e1, e2));
 
-        mockMvc.perform(get("/api/expenses"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$[0].description").value("Bilet lotniczy"))
-               .andExpect(jsonPath("$[1].description").value("Hotel"));
+        mockMvc.perform(get("/api/v1/expenses"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].description").value("Bilet lotniczy"))
+                .andExpect(jsonPath("$[1].description").value("Hotel"));
     }
 
     @Test
-    void getExpenseById_ok() throws Exception {
+    void shouldReturnExpenseById() throws Exception {
         Mockito.when(expenseService.getExpenseById(1)).thenReturn(sample(1, "Bilet lotniczy", BigDecimal.valueOf(1500), "Transport"));
 
-        mockMvc.perform(get("/api/expenses/1"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.description").value("Bilet lotniczy"));
+        mockMvc.perform(get("/api/v1/expenses/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description").value("Bilet lotniczy"));
     }
 
     @Test
-    void getExpenseById_notFound() throws Exception {
+    void shouldReturn404WhenExpenseNotFound() throws Exception {
         Mockito.when(expenseService.getExpenseById(1)).thenThrow(new ResourceNotFoundException("Expense not found"));
 
-        mockMvc.perform(get("/api/expenses/1"))
-               .andExpect(status().isNotFound())
-               .andExpect(jsonPath("$.error").value("Expense not found"));
+        mockMvc.perform(get("/api/v1/expenses/1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Expense not found"));
     }
 
     @Test
-    void createExpense_created() throws Exception {
+    void shouldCreateExpense() throws Exception {
         Expense body = sample(null, "Bilet lotniczy", BigDecimal.valueOf(1500), "Transport");
         Mockito.when(expenseService.createExpense(any(Expense.class))).thenReturn(body);
 
-        mockMvc.perform(post("/api/expenses")
+        mockMvc.perform(post("/api/v1/expenses")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(body)))
-               .andExpect(status().isCreated())
-               .andExpect(jsonPath("$.description").value("Bilet lotniczy"));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.description").value("Bilet lotniczy"));
     }
 
     @Test
-    void createExpense_badRequest() throws Exception {
-        mockMvc.perform(post("/api/expenses")
+    void shouldReturnBadRequestWhenCreateExpenseWithInvalidData() throws Exception {
+        mockMvc.perform(post("/api/v1/expenses")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
-               .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void updateExpense_ok() throws Exception {
+    void shouldUpdateExpense() throws Exception {
         Expense updatedExpense = sample(1, "Hotel", BigDecimal.valueOf(2000), "Accommodation");
         Mockito.when(expenseService.updateExpense(Mockito.eq(1), Mockito.any(Expense.class)))
-           .thenReturn(updatedExpense);
-           
-        mockMvc.perform(put("/api/expenses/1")
+                .thenReturn(updatedExpense);
+
+        mockMvc.perform(put("/api/v1/expenses/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedExpense)))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.description").value("Hotel"))
-               .andExpect(jsonPath("$.amount").value(2000))
-               .andExpect(jsonPath("$.category").value("Accommodation"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description").value("Hotel"))
+                .andExpect(jsonPath("$.amount").value(2000))
+                .andExpect(jsonPath("$.category").value("Accommodation"));
     }
 
     @Test
-    void updateExpense_notFound() throws Exception {
+    void shouldReturn404WhenUpdateExpenseNotFound() throws Exception {
         Expense updatedExpense = sample(1, "Hotel", BigDecimal.valueOf(2000), "Accommodation");
         Mockito.when(expenseService.updateExpense(Mockito.eq(1), Mockito.any(Expense.class)))
-               .thenThrow(new ResourceNotFoundException("Expense not found"));
+                .thenThrow(new ResourceNotFoundException("Expense not found"));
 
-        mockMvc.perform(put("/api/expenses/1")
+        mockMvc.perform(put("/api/v1/expenses/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedExpense)))
-               .andExpect(status().isNotFound())
-               .andExpect(jsonPath("$.error").value("Expense not found"))
-               .andExpect(jsonPath("$.status").value(404));
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Expense not found"))
+                .andExpect(jsonPath("$.status").value(404));
     }
 
     @Test
-    void deleteExpense_ok() throws Exception {
+    void shouldDeleteExpense() throws Exception {
         Mockito.doNothing().when(expenseService).deleteExpense(1);
 
-        mockMvc.perform(delete("/api/expenses/1"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.message").value("Expense deleted"));
+        mockMvc.perform(delete("/api/v1/expenses/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Expense deleted"));
     }
 
     @Test
-    void deleteExpense_notFound() throws Exception {
+    void shouldReturn404WhenDeleteExpenseNotFound() throws Exception {
         Mockito.doThrow(new ResourceNotFoundException("Expense not found")).when(expenseService).deleteExpense(1);
 
-        mockMvc.perform(delete("/api/expenses/1"))
-               .andExpect(status().isNotFound())
-               .andExpect(jsonPath("$.error").value("Expense not found"));
+        mockMvc.perform(delete("/api/v1/expenses/1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Expense not found"));
+    }
+
+    @Test
+    void shouldReturnExpensesForTrip() throws Exception {
+        Expense e1 = sample(1, "Bilet lotniczy", BigDecimal.valueOf(1500), "Transport");
+        Expense e2 = sample(2, "Hotel", BigDecimal.valueOf(2000), "Accommodation");
+        Mockito.when(expenseService.getExpensesForTrip(1)).thenReturn(List.of(e1, e2));
+
+        mockMvc.perform(get("/api/v1/expenses/trip/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].description").value("Bilet lotniczy"))
+                .andExpect(jsonPath("$[1].description").value("Hotel"));
     }
 
     private Expense sample(Integer id, String description, BigDecimal amount, String category) {
@@ -153,8 +165,7 @@ class ExpensesControllerTest {
         trip.setStatus("PLANNED");
         trip.setCreatedBy(user);
         e.setTrip(trip);
-        
+
         return e;
     }
-
 }

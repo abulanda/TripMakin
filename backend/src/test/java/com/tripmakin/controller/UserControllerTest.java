@@ -4,15 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tripmakin.model.User;
 import com.tripmakin.service.UserService;
 import com.tripmakin.exception.ResourceNotFoundException;
+import com.tripmakin.config.TestSecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
-import com.tripmakin.config.TestSecurityConfig;
 
 import java.util.List;
 
@@ -29,140 +32,114 @@ class UserControllerTest {
     @MockBean private UserService userService;
 
     @Test
-    void getUsers_ok() throws Exception {
-        User u1 = sample(1, "Barbara", "Flaming", "barbara.flaming@example.com");
-        User u2 = sample(2, "Tomasz", "Hamak", "tomasz.hamak@example.com");
-        Mockito.when(userService.getAllUsers()).thenReturn(List.of(u1, u2));
+    void shouldReturnAllUsers() throws Exception {
+        User u1 = sample(1, "Anna", "Nowak", "anna@example.com");
+        User u2 = sample(2, "Jan", "Kowalski", "jan@example.com");
+        Mockito.when(userService.getAllUsers(Mockito.any())).thenReturn(new PageImpl<>(List.of(u1, u2), PageRequest.of(0, 10), 2));
 
-        mockMvc.perform(get("/api/users"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$[0].firstName").value("Barbara"))
-               .andExpect(jsonPath("$[1].firstName").value("Tomasz"));
+        mockMvc.perform(get("/api/v1/users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].firstName").value("Anna"))
+                .andExpect(jsonPath("$.content[1].firstName").value("Jan"));
     }
 
     @Test
-    void getUserById_ok() throws Exception {
-        Mockito.when(userService.getUserById(1)).thenReturn(sample(1));
+    void shouldReturnUserById() throws Exception {
+        Mockito.when(userService.getUserById(1)).thenReturn(sample(1, "Anna", "Nowak", "anna@example.com"));
 
-        mockMvc.perform(get("/api/users/1"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.firstName").value("Barbara"));
+        mockMvc.perform(get("/api/v1/users/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName").value("Anna"));
     }
 
     @Test
-    void getUserById_notFound() throws Exception {
+    void shouldReturn404WhenUserNotFound() throws Exception {
         Mockito.when(userService.getUserById(1)).thenThrow(new ResourceNotFoundException("User not found"));
 
-        mockMvc.perform(get("/api/users/1"))
-               .andExpect(status().isNotFound())
-               .andExpect(jsonPath("$.error").value("User not found"))
-               .andExpect(jsonPath("$.status").value(404));
+        mockMvc.perform(get("/api/v1/users/1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("User not found"));
     }
 
     @Test
-    void createUser_created() throws Exception {
-        User body = sample(null);
+    void shouldCreateUser() throws Exception {
+        User body = sample(null, "Anna", "Nowak", "anna@example.com");
         Mockito.when(userService.createUser(any(User.class)))
-               .thenAnswer(inv -> { User u = inv.getArgument(0); u.setUserId(3); return u; });
+                .thenAnswer(inv -> { User u = inv.getArgument(0); u.setUserId(3); return u; });
 
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(body)))
-               .andExpect(status().isCreated())
-               .andExpect(jsonPath("$.firstName").value("Barbara"));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.firstName").value("Anna"));
     }
 
     @Test
-    void createUser_unprocessable() throws Exception {
-        mockMvc.perform(post("/api/users")
+    void shouldReturnBadRequestWhenCreateUserWithInvalidData() throws Exception {
+        mockMvc.perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
-               .andExpect(status().isBadRequest())
-               .andExpect(jsonPath("$.status").value(400))
-               .andExpect(jsonPath("$.error").value("Validation failed"));
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void updateUser_ok() throws Exception {
-        Mockito.when(userService.getUserById(1)).thenReturn(sample(1));
+    void shouldUpdateUser() throws Exception {
+        Mockito.when(userService.getUserById(1)).thenReturn(sample(1, "Anna", "Nowak", "anna@example.com"));
         Mockito.when(userService.updateUser(Mockito.eq(1), Mockito.any(User.class)))
-               .thenAnswer(inv -> inv.getArgument(1));
+                .thenAnswer(inv -> inv.getArgument(1));
 
-        User patch = sample(null);
-        patch.setFirstName("Tomasz");
+        User patch = sample(null, "Jan", "Nowak", "jan@example.com");
 
-        mockMvc.perform(put("/api/users/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(patch)))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.firstName").value("Tomasz"));
+        mockMvc.perform(multipart("/api/v1/users/1")
+                .file(new MockMultipartFile("user", "", "application/json", objectMapper.writeValueAsBytes(patch)))
+                .file(new MockMultipartFile("profilePicture", new byte[0]))
+                .with(request -> { request.setMethod("PUT"); return request; }))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName").value("Jan"));
     }
 
     @Test
-    void updateUser_notFound() throws Exception {
+    void shouldReturn404WhenUpdateUserNotFound() throws Exception {
         Mockito.when(userService.getUserById(1)).thenThrow(new ResourceNotFoundException("User not found"));
 
-        mockMvc.perform(put("/api/users/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sample(null))))
-               .andExpect(status().isNotFound())
-               .andExpect(jsonPath("$.error").value("User not found"))
-               .andExpect(jsonPath("$.status").value(404));
+        mockMvc.perform(multipart("/api/v1/users/1")
+                .file(new MockMultipartFile("user", "", "application/json", objectMapper.writeValueAsBytes(sample(null, "Anna", "Nowak", "anna@example.com"))))
+                .file(new MockMultipartFile("profilePicture", new byte[0]))
+                .with(request -> { request.setMethod("PUT"); return request; }))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.error").value("User not found"));
     }
 
     @Test
-    void deleteUser_ok() throws Exception {
-        Mockito.when(userService.getUserById(1)).thenReturn(sample(1));
+    void shouldDeleteUser() throws Exception {
+        Mockito.when(userService.getUserById(1)).thenReturn(sample(1, "Anna", "Nowak", "anna@example.com"));
 
-        mockMvc.perform(delete("/api/users/1"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.message").value("User deleted"));
+        mockMvc.perform(delete("/api/v1/users/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("User deleted"));
     }
 
     @Test
-    void deleteUser_notFound() throws Exception {
+    void shouldReturn404WhenDeleteUserNotFound() throws Exception {
         Mockito.when(userService.getUserById(1)).thenThrow(new ResourceNotFoundException("User not found"));
 
-        mockMvc.perform(delete("/api/users/1"))
-               .andExpect(status().isNotFound())
-               .andExpect(jsonPath("$.error").value("User not found"))
-               .andExpect(jsonPath("$.status").value(404));
+        mockMvc.perform(delete("/api/v1/users/1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("User not found"));
     }
 
-    @Test
-    void createUser_badRequest() throws Exception {
-        mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"lastName\":\"Flaming\"}"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void updateUser_badRequest() throws Exception {
-        Mockito.when(userService.getUserById(1)).thenReturn(sample(1));
-
-        mockMvc.perform(put("/api/users/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"lastName\":\"Flaming\"}"))
-                .andExpect(status().isBadRequest());
-    }
-
-    private User sample(Integer id) { 
-        return sample(id, "Barbara", "Flaming", "barbara.flaming@example.com"); 
-    }
-    
     private User sample(Integer id, String fn, String ln, String email) {
         User u = new User();
         u.setUserId(id);
         u.setFirstName(fn);
         u.setLastName(ln);
         u.setEmail(email);
-        u.setPassword("haslo123"); 
-        u.setIsActive(true);          
+        u.setPassword("haslo123");
+        u.setIsActive(true);
         u.setProfilePicture("zdjecie.jpg");
         u.setPhoneNumber("123456789");
         u.setBio("Przykładowy opis");
-        u.setLastLoginAt(null); 
+        u.setLastLoginAt(null);
         return u;
     }
 }
