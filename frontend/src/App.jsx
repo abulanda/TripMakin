@@ -82,12 +82,12 @@ function App() {
           path="/admin"
           element={
             <RequireAdmin payload={payload}>
-              <AdminPanel />
+              <AdminPanel payload={payload} onLogout={handleLogout} />
             </RequireAdmin>
           }
         />
-        <Route path="/users/:id" element={<UserPanel />} />
-        <Route path="/trips/:id" element={<TripDetails />} />
+        <Route path="/users/:id" element={<UserPanel payload={payload} onLogout={handleLogout} />} />
+        <Route path="/trips/:id" element={<TripDetails payload={payload} onLogout={handleLogout} />} />
         <Route
           path="*"
           element={<Dashboard payload={payload} onLogout={handleLogout} />}

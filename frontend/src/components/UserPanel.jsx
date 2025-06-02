@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import { authFetch } from "../utils/authFetch";
 
-const UserPanel = () => {
+const UserPanel = ({ onLogout }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -84,14 +84,14 @@ const UserPanel = () => {
 
   if (loading || !user) return (
     <>
-      <Navbar onLogout={handleLogout} />
+      <Navbar onLogout={onLogout} />
       <p>Ładowanie...</p>
     </>
   );
 
   return (
     <>
-      <Navbar onLogout={handleLogout} />
+      <Navbar onLogout={onLogout} />
       <div style={{ display: 'flex', justifyContent: 'flex-start', margin: '90px 0 1.5rem 2.5rem' }}>
         <button
           style={{

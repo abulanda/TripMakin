@@ -7,7 +7,7 @@ import Navbar from "./Navbar";
 import { authFetch } from "../utils/authFetch";
 import "./TripDetails.css";
 
-const TripDetails = () => {
+const TripDetails = ({ onLogout }) => {
   const { id } = useParams();
   const [trip, setTrip] = useState(null);
   const [participants, setParticipants] = useState([]);
@@ -58,7 +58,7 @@ const TripDetails = () => {
 
   return (
     <>
-      <Navbar onLogout={handleLogout} />
+      <Navbar onLogout={onLogout} />
       <div className="trip-details-page">
         <div className="trip-details-back">
           <Link to="/">⬅ Powrót</Link>

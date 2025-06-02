@@ -5,7 +5,7 @@ import "./AdminPanel.css";
 import { authFetch } from "../utils/authFetch";
 
 
-const AdminPanel = () => {
+const AdminPanel = ({ onLogout }) => {
   const [users, setUsers] = useState([]);
   const [trips, setTrips] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
@@ -100,11 +100,7 @@ const AdminPanel = () => {
 
   return (
     <>
-      <Navbar onLogout={() => {
-        localStorage.removeItem("userId");
-        localStorage.removeItem("payload");
-        window.location.href = "/";
-      }} />
+      <Navbar onLogout={onLogout} />
       <div className="admin-panel-container">
         <button
           onClick={() => navigate("/")}
