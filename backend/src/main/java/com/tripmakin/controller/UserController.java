@@ -17,6 +17,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,8 +40,19 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Operation(summary = "Get all users", description = "Retrieve a list of all users")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved list of users")
+    @Operation(
+        summary = "Get all users",
+        description = "Retrieve a paginated list of all users",
+        parameters = {
+            @Parameter(name = "page", description = "Page number (zero-based)", example = "0"),
+            @Parameter(name = "size", description = "Page size", example = "10"),
+            @Parameter(name = "sort", description = "Sort format: [property,asc|desc]", example = "[\"userId\",\"asc\"]")
+        }
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved list of users",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)))
+    })
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<Page<User>> getUsers(
@@ -51,10 +66,17 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @Operation(summary = "Get a user by ID", description = "Retrieve a specific user by their ID")
+    @Operation(
+        summary = "Get a user by ID",
+        description = "Retrieve a specific user by their ID",
+        parameters = @Parameter(name = "id", description = "ID of the user", required = true, example = "1")
+    )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved the user"),
-        @ApiResponse(responseCode = "404", description = "User not found")
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved the user",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
+        @ApiResponse(responseCode = "404", description = "User not found",
+            content = @Content(mediaType = "application/json",
+                examples = @ExampleObject(value = "{\"error\": \"User not found\"}")))
     })
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Integer id) {
@@ -62,21 +84,36 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @Operation(summary = "Create a new user", description = "Add a new user to the system")
+    @Operation(
+        summary = "Create a new user",
+        description = "Add a new user to the system"
+    )
     @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "User successfully created"),
-        @ApiResponse(responseCode = "400", description = "Validation failed")
+        @ApiResponse(responseCode = "201", description = "User successfully created",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
+        @ApiResponse(responseCode = "400", description = "Validation failed",
+            content = @Content(mediaType = "application/json",
+                examples = @ExampleObject(value = "{\"error\": \"Validation failed\"}")))
     })
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User newUser) {
         return ResponseEntity.status(201).body(userService.createUser(newUser));
     }
 
-    @Operation(summary = "Update an existing user", description = "Update the details of an existing user")
+    @Operation(
+        summary = "Update an existing user",
+        description = "Update the details of an existing user",
+        parameters = @Parameter(name = "id", description = "ID of the user", required = true, example = "1")
+    )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "User successfully updated"),
-        @ApiResponse(responseCode = "404", description = "User not found"),
-        @ApiResponse(responseCode = "400", description = "Validation failed")
+        @ApiResponse(responseCode = "200", description = "User successfully updated",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
+        @ApiResponse(responseCode = "404", description = "User not found",
+            content = @Content(mediaType = "application/json",
+                examples = @ExampleObject(value = "{\"error\": \"User not found\"}"))),
+        @ApiResponse(responseCode = "400", description = "Validation failed",
+            content = @Content(mediaType = "application/json",
+                examples = @ExampleObject(value = "{\"error\": \"Validation failed\"}")))
     })
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(
@@ -97,10 +134,18 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(id, updatedUser));
     }
 
-    @Operation(summary = "Delete a user", description = "Remove a user from the system")
+    @Operation(
+        summary = "Delete a user",
+        description = "Remove a user from the system",
+        parameters = @Parameter(name = "id", description = "ID of the user", required = true, example = "1")
+    )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "User successfully deleted"),
-        @ApiResponse(responseCode = "404", description = "User not found")
+        @ApiResponse(responseCode = "200", description = "User successfully deleted",
+            content = @Content(mediaType = "application/json",
+                examples = @ExampleObject(value = "{\"message\": \"User deleted\"}"))),
+        @ApiResponse(responseCode = "404", description = "User not found",
+            content = @Content(mediaType = "application/json",
+                examples = @ExampleObject(value = "{\"error\": \"User not found\"}")))
     })
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
@@ -110,10 +155,17 @@ public class UserController {
         return ResponseEntity.ok(Map.of("message", "User deleted"));
     }
 
-    @Operation(summary = "Get user by email", description = "Retrieve a user by their email address")
+    @Operation(
+        summary = "Get user by email",
+        description = "Retrieve a user by their email address",
+        parameters = @Parameter(name = "email", description = "Email address of the user", required = true, example = "user@example.com")
+    )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved the user"),
-        @ApiResponse(responseCode = "404", description = "User not found")
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved the user",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
+        @ApiResponse(responseCode = "404", description = "User not found",
+            content = @Content(mediaType = "application/json",
+                examples = @ExampleObject(value = "{\"error\": \"User not found\"}")))
     })
     @GetMapping("/email/{email}")
     public ResponseEntity<User> getUserByEmail(@PathVariable String email) {

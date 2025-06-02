@@ -21,6 +21,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "Auth", description = "Endpoints for authentication and user session management")
 @RestController
 @RequestMapping("/api/v1/auth")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
@@ -43,6 +53,18 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
     }
 
+    @Operation(
+        summary = "Authenticate user and return JWT",
+        description = "Authenticate user credentials and return JWT and refresh token cookies"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Successfully authenticated",
+            content = @Content(mediaType = "application/json",
+                examples = @ExampleObject(value = "{\"userId\": 1}"))),
+        @ApiResponse(responseCode = "401", description = "Invalid credentials",
+            content = @Content(mediaType = "application/json",
+                examples = @ExampleObject(value = "{\"error\": \"Invalid credentials\"}")))
+    })
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody AuthRequest authRequest, HttpServletResponse response) {
         try {
@@ -85,6 +107,13 @@ public class AuthController {
         }
     }
 
+    @Operation(
+        summary = "Logout user",
+        description = "Clear authentication cookies and logout user"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Successfully logged out")
+    })
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
         Cookie cookie = new Cookie("jwtToken", "");
@@ -95,11 +124,28 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+        summary = "Test endpoint",
+        description = "Simple test endpoint for authentication"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Test page")
+    })
     @GetMapping("/test")
     public String test() {
         return "Test page";
     }
 
+    @Operation(
+        summary = "Get current user info",
+        description = "Get information about the currently authenticated user"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved user info",
+            content = @Content(mediaType = "application/json",
+                examples = @ExampleObject(value = "{\"username\": \"user@example.com\", \"roles\": [\"ROLE_USER\"]}"))),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @GetMapping("/me")
     public ResponseEntity<?> me(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -111,6 +157,16 @@ public class AuthController {
         ));
     }
 
+    @Operation(
+        summary = "Refresh JWT token",
+        description = "Refresh JWT and refresh token using the refresh token cookie"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Successfully refreshed tokens"),
+        @ApiResponse(responseCode = "401", description = "Refresh token invalid",
+            content = @Content(mediaType = "application/json",
+                examples = @ExampleObject(value = "Refresh token invalid")))
+    })
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
