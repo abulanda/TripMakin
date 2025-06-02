@@ -172,3 +172,61 @@
     max-width: 120px;
   }
 }
+
+@media (max-width: 600px) {
+  .trip-expenses-card table,
+  .trip-schedule-card table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    background: none;
+    box-shadow: none;
+  }
+  .trip-expenses-card thead,
+  .trip-schedule-card thead {
+    display: none;
+  }
+  .trip-expenses-card tbody tr,
+  .trip-schedule-card tbody tr {
+    display: block;
+    margin: 1.2em auto;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(58, 91, 60, 0.06);
+    padding: 0.7em 0.5em;
+    width: 90vw;
+    max-width: 500px;
+  }
+  .trip-expenses-card td,
+  .trip-schedule-card td {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.4em 0.5em;
+    font-size: 1em;
+    border: none;
+    max-width: none;
+    min-width: 0;
+    word-break: break-word;
+    position: relative;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .trip-expenses-card td::before,
+  .trip-schedule-card td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #3a5b3c;
+    margin-bottom: 2px;
+    min-width: 0;
+    margin-right: 0;
+    display: block;
+  }
+  .trip-expenses-card th:first-child, 
+  .trip-expenses-card td:first-child, 
+  .trip-schedule-card th:first-child, 
+  .trip-schedule-card td:first-child {
+    padding: 0.5rem;
+  }
+
+}

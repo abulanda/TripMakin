@@ -100,3 +100,126 @@
   background: #fff;
   color: #3a5b3c;
 }
+
+@media (max-width: 900px) {
+  .admin-panel-container {
+    width: 98vw;
+    min-width: 0;
+    padding: 10px 2vw;
+    margin: 70px auto 20px auto;
+    border-radius: 10px;
+  }
+  .admin-users-box {
+    margin-bottom: 24px;
+    border-radius: 10px;
+  }
+  .admin-panel-title {
+    font-size: 1.3rem;
+    margin-bottom: 18px;
+  }
+  .admin-users-header {
+    font-size: 1.1rem;
+    padding: 10px 0;
+  }
+  .admin-users-table,
+  .admin-users-table th,
+  .admin-users-table td {
+    font-size: 0.97em;
+    padding: 6px;
+  }
+  .admin-delete-btn {
+    font-size: 1em;
+    padding: 8px 18px;
+  }
+}
+
+
+@media (max-width: 600px) {
+  .admin-panel-container {
+    width: 100vw;
+    min-width: 0;
+    padding: 6px 0.5vw;
+    margin: 60px 0 10px 0;
+    border-radius: 8px;
+  }
+  .admin-users-box {
+    overflow-x: auto;
+  }
+  .admin-users-table {
+    display: block;
+    width: 100%;
+    min-width: 700px;
+    overflow-x: auto;
+    font-size: 0.93em;
+    table-layout: auto;
+  }
+  .admin-users-table thead,
+  .admin-users-table tbody,
+  .admin-users-table tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+  .admin-users-table th,
+  .admin-users-table td {
+    padding: 5px 8px;
+    font-size: 0.93em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+  }
+  .admin-users-table th:last-child,
+  .admin-users-table td:last-child {
+    max-width: 80px;
+  }
+  .admin-delete-btn {
+    font-size: 1em;
+    padding: 10px 22px;
+    white-space: nowrap;
+  }
+  .admin-panel-title {
+    font-size: 1.1rem;
+  }
+
+  .admin-panel-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+    width: 50%;
+    margin-bottom: 10px;
+  }
+
+  .admin-panel-controls > * {
+    width: 50% !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+    display: block !important;
+  }
+
+  .admin-panel-container select,
+  .admin-panel-container button,
+  .admin-panel-container input {
+    width: 100% !important;
+    margin: 0 0 8px 0 !important;
+    box-sizing: border-box;
+    display: block;
+  }
+
+  .admin-pagination {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+    width: 50%;
+    margin-top: 12px;
+    margin-bottom: 0;
+    justify-content: stretch;
+  }
+
+  .admin-pagination button {
+    width: 50%;
+    margin-bottom: 8px;
+  }
+}
