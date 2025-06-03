@@ -2,6 +2,7 @@ package com.tripmakin.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -20,6 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -84,30 +86,37 @@ class UserControllerTest {
 
     @Test
     void shouldUpdateUser() throws Exception {
-        Mockito.when(userService.getUserById(1)).thenReturn(sample(1, "Anna", "Nowak", "anna@example.com"));
-        Mockito.when(userService.updateUser(Mockito.eq(1), Mockito.any(User.class)))
-                .thenAnswer(inv -> inv.getArgument(1));
+        User user = new User();
+        user.setUserId(1);
+        user.setFirstName("Jan");
+        user.setLastName("Kowalski");
+        user.setEmail("jan@kowalski.pl");
 
-        User patch = sample(null, "Jan", "Nowak", "jan@example.com");
+        when(userService.updateUser(anyInt(), any(User.class))).thenReturn(user);
 
-        mockMvc.perform(multipart("/api/v1/users/1")
-                .file(new MockMultipartFile("user", "", "application/json", objectMapper.writeValueAsBytes(patch)))
-                .file(new MockMultipartFile("profilePicture", new byte[0]))
-                .with(request -> { request.setMethod("PUT"); return request; }))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.firstName").value("Jan"));
+        mockMvc.perform(put("/api/v1/users/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.userId").value(1));
     }
 
     @Test
     void shouldReturn404WhenUpdateUserNotFound() throws Exception {
-        Mockito.when(userService.getUserById(1)).thenThrow(new ResourceNotFoundException("User not found"));
+        User user = new User();
+        user.setUserId(1);
+        user.setFirstName("Jan");
+        user.setLastName("Kowalski");
+        user.setEmail("jan@kowalski.pl");
 
-        mockMvc.perform(multipart("/api/v1/users/1")
-                .file(new MockMultipartFile("user", "", "application/json", objectMapper.writeValueAsBytes(sample(null, "Anna", "Nowak", "anna@example.com"))))
-                .file(new MockMultipartFile("profilePicture", new byte[0]))
-                .with(request -> { request.setMethod("PUT"); return request; }))
-        .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.error").value("User not found"));
+        when(userService.updateUser(anyInt(), any(User.class)))
+            .thenThrow(new com.tripmakin.exception.ResourceNotFoundException("User not found"));
+
+        mockMvc.perform(put("/api/v1/users/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user)))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.error").value("User not found"));
     }
 
     @Test
@@ -128,6 +137,24 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.error").value("User not found"));
     }
 
+    @Test
+    void shouldReturnUserByEmail() throws Exception {
+        Mockito.when(userService.findByEmail("anna@example.com")).thenReturn(sample(1, "Anna", "Nowak", "anna@example.com"));
+
+        mockMvc.perform(get("/api/v1/users/email/anna@example.com"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName").value("Anna"));
+    }
+
+    @Test
+    void shouldReturn404WhenUserByEmailNotFound() throws Exception {
+        Mockito.when(userService.findByEmail("nieistnieje@example.com")).thenReturn(null);
+
+        mockMvc.perform(get("/api/v1/users/email/nieistnieje@example.com"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("User not found"));
+    }
+
     private User sample(Integer id, String fn, String ln, String email) {
         User u = new User();
         u.setUserId(id);
@@ -136,7 +163,6 @@ class UserControllerTest {
         u.setEmail(email);
         u.setPassword("haslo123");
         u.setIsActive(true);
-        u.setProfilePicture("zdjecie.jpg");
         u.setPhoneNumber("123456789");
         u.setBio("Przykładowy opis");
         u.setLastLoginAt(null);
