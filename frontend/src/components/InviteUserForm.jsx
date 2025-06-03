@@ -54,7 +54,6 @@ const InviteUserForm = ({ tripId, onUserInvited }) => {
         if (!res.ok) throw new Error("Błąd podczas wysyłania zaproszenia");
         setEmail("");
         onUserInvited && onUserInvited();
-        alert("Zaproszenie wysłane!");
       })
       .catch((err) => {
         setLoading(false);

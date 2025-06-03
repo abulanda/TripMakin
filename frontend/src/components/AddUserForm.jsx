@@ -32,7 +32,6 @@ const AddUserForm = ({ onUserAdded }) => {
         return res.json();
       })
       .then((data) => {
-        alert("Użytkownik dodany!");
         onUserAdded();
         setFormData({
           firstName: "",

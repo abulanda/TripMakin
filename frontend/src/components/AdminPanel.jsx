@@ -74,7 +74,6 @@ const AdminPanel = ({ onLogout }) => {
     })
       .then(res => {
         if (res.ok) fetchUsers();
-        else alert("Błąd usuwania użytkownika");
       });
   };
 
@@ -86,7 +85,6 @@ const AdminPanel = ({ onLogout }) => {
     })
       .then(res => {
         if (res.ok) fetchTrips();
-        else alert("Błąd usuwania wycieczki");
       });
   };
 

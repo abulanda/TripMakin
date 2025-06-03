@@ -40,7 +40,6 @@ const RegisterPage = ({ onRegister }) => {
         return res.json();
       })
       .then((data) => {
-        alert("Rejestracja zakończona sukcesem!");
         onRegister();
       })
       .catch((err) => alert(err.message));
