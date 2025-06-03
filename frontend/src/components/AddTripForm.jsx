@@ -39,7 +39,6 @@ const AddTripForm = ({ onTripAdded }) => {
         return res.json();
       })
       .then((data) => {
-        alert("Wycieczka została dodana!");
         onTripAdded();
         setFormData({
           destination: "",
