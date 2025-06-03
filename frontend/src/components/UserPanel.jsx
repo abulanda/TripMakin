@@ -67,7 +67,6 @@ const UserPanel = ({ onLogout }) => {
       .then(data => {
         setUser(data);
         setEdit(false);
-        alert("Dane zapisane!");
       })
       .catch(err => alert(err.message));
   };

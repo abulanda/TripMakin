@@ -27,7 +27,6 @@ const Dashboard = ({ payload, onLogout }) => {
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Błąd podczas pobierania wycieczek:", err);
         setLoading(false);
       });
   };

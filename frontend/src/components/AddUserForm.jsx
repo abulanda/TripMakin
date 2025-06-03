@@ -43,7 +43,6 @@ const AddUserForm = ({ onUserAdded }) => {
           isActive: true,
         });
       })
-      .catch((err) => console.error(err));
   };
 
   return (

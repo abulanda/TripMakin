@@ -9,7 +9,6 @@ const UserList = ({ refresh }) => {
     authFetch("/api/v1/users", { credentials: "include" })
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => setUsers(data))
-      .catch((err) => console.error("Błąd:", err));
   };
 
   useEffect(() => {
