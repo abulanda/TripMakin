@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.tripmakin.messaging.MessageProducer;
 
@@ -62,9 +63,23 @@ public class UserService {
         existingUser.setProfilePicture(updatedUser.getProfilePicture());
         existingUser.setPhoneNumber(updatedUser.getPhoneNumber());
         existingUser.setBio(updatedUser.getBio());
-        existingUser.setLastLoginAt(updatedUser.getLastLoginAt());
         existingUser.setIsActive(updatedUser.getIsActive());
         return userRepository.save(existingUser);
+    }
+
+    public User updateUser(Integer id, User updatedUser, MultipartFile profilePicture) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        user.setFirstName(updatedUser.getFirstName());
+        user.setLastName(updatedUser.getLastName());
+        user.setEmail(updatedUser.getEmail());
+        user.setPhoneNumber(updatedUser.getPhoneNumber());
+        user.setBio(updatedUser.getBio());
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        }
+        return userRepository.save(user);
     }
 
     public void deleteUser(Integer id) {

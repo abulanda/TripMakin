@@ -2,6 +2,8 @@ package com.tripmakin.controller;
 
 import com.tripmakin.model.User;
 import com.tripmakin.service.UserService;
+import com.tripmakin.repository.UserRepository;
+import java.time.LocalDateTime;
 import com.tripmakin.service.RefreshTokenService;
 import com.tripmakin.security.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,6 +38,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class AuthController {
 
+    private final UserRepository userRepository;
+
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
@@ -46,11 +50,12 @@ public class AuthController {
         UserService userService,
         RefreshTokenService refreshTokenService,
         JwtUtil jwtUtil
-    ) {
+    , UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
         this.refreshTokenService = refreshTokenService;
         this.jwtUtil = jwtUtil;
+        this.userRepository = userRepository;
     }
 
     @Operation(
@@ -98,6 +103,9 @@ public class AuthController {
             refreshCookie.setMaxAge(7 * 24 * 60 * 60);
             refreshCookie.setSecure(false);
             response.addCookie(refreshCookie);
+
+            user.setLastLoginAt(LocalDateTime.now());
+            userRepository.save(user);
 
             return ResponseEntity.ok(Map.of(
                 "userId", user.getUserId()

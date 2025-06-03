@@ -37,10 +37,7 @@ const UserPanel = ({ onLogout }) => {
 
   const handleSave = (e) => {
     e.preventDefault();
-    const formData = new FormData();
-
     const userPayload = { ...form };
-    delete userPayload.profilePictureFile;
     delete userPayload.createdAt;
     delete userPayload.lastLoginAt;
     delete userPayload.roles;
@@ -55,15 +52,13 @@ const UserPanel = ({ onLogout }) => {
       delete userPayload.password;
     }
 
-    formData.append("user", JSON.stringify(userPayload));
-    if (form.profilePictureFile) {
-      formData.append("profilePicture", form.profilePictureFile);
-    }
-
     authFetch(`/api/v1/users/${id}`, {
       method: "PUT",
       credentials: "include",
-      body: formData,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userPayload),
     })
       .then(res => {
         if (!res.ok) throw new Error("Błąd podczas zapisu");
@@ -117,11 +112,6 @@ const UserPanel = ({ onLogout }) => {
             <p><b>Email:</b> {user.email}</p>
             <p><b>Telefon:</b> {user.phoneNumber || "-"}</p>
             <p><b>Bio:</b> {user.bio || "-"}</p>
-            {user.profilePicture && (
-              <div>
-                <img src={user.profilePicture} alt="Profilowe" style={{ maxWidth: 120, borderRadius: 8 }} />
-              </div>
-            )}
             <button onClick={() => setEdit(true)}>Edytuj dane</button>
           </div>
         ) : (
@@ -165,19 +155,6 @@ const UserPanel = ({ onLogout }) => {
               onChange={handleChange}
               placeholder="Bio"
             />
-            <div>
-              <label>Zdjęcie profilowe:</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={e => setForm(prev => ({ ...prev, profilePictureFile: e.target.files[0] }))}
-              />
-              {user.profilePicture && (
-                <div>
-                  <img src={user.profilePicture} alt="Profilowe" style={{ maxWidth: 120, borderRadius: 8 }} />
-                </div>
-              )}
-            </div>
             <button type="submit">Zapisz</button>
             <button type="button" onClick={() => setEdit(false)}>Anuluj</button>
           </form>

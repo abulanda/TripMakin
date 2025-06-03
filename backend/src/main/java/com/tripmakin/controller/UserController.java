@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.springframework.util.StringUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Tag(name = "Users", description = "Endpoints for managing users")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
@@ -117,21 +119,11 @@ public class UserController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(
-        @PathVariable Integer id,
-        @RequestPart("user") @Valid User updatedUser,
-        @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture
+            @PathVariable Integer id,
+            @RequestBody User updatedUser
     ) {
-        User user = userService.getUserById(id);
-        if (user == null) {
-            throw new ResourceNotFoundException("User not found");
-        }
-        if (profilePicture != null && !profilePicture.isEmpty()) {
-            String fileName = saveProfilePicture(profilePicture, id);
-            updatedUser.setProfilePicture(fileName);
-        } else {
-            updatedUser.setProfilePicture(user.getProfilePicture());
-        }
-        return ResponseEntity.ok(userService.updateUser(id, updatedUser));
+        User user = userService.updateUser(id, updatedUser);
+        return ResponseEntity.ok(user);
     }
 
     @Operation(
